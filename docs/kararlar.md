@@ -14,3 +14,9 @@
   Hiçbir sahneye elle eklemek gerekmiyor, böylece sahne sahipliği çakışması olmuyor. Yazan: Ceren.
 - **Branch düzeni: konu başına feature/... yerine kişi başına tek branch (ceren, zeynep).**
   Her PR küçük tutulacak (bir iş, bir PR); birleşince branch develop ile güncellenecek.
+
+## 17 Ekim 2026
+
+- **TextMesh Pro Essentials yalnızca Zeynep tarafından import edilir ve commit'lenir; diğer kişi import etmez, develop'tan çeker.**
+  Sebep: aynı .meta dosyalarının iki yerde oluşup çakışması. "TMP Examples & Extras" ağır ve gereksiz olduğu için import edilmez.
+  Ceren'in sahnelerinde doğrudan yazı gerekmez: ipucu metinleri (ör. "E ile etkileşim") IInteractable üzerinden Zeynep'in HUD'ında gösterilir.

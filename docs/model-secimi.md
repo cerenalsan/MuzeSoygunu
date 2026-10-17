@@ -1,64 +1,32 @@
-\# Model Seçimi Notları (15-16 Ekim 2026)
+# Model Seçimi Notları (15-16 Ekim 2026)
 
+## Ortam
+- Windows, 6 GB VRAM'li ekran kartı, modeller Ollama ile yerelde çalışıyor
+- Canlı demo bu bilgisayarda yapılacak
 
-
-\## Ortam
-
-\- Windows, 6 GB VRAM'li ekran kartı, modeller Ollama ile yerelde çalışıyor
-
-\- Canlı demo bu bilgisayarda yapılacak
-
-
-
-\## Denenen modeller
-
+## Denenen modeller
 | Model | Boyut | Gözlem |
-
 |---|---|---|
-
 | llama3.2:3b | 2.0 GB | Düz sohbette Türkçe bozuk: İngilizce ve Endonezce kelimeler karıştı, anlamsız cümleler |
-
 | gemma2:2b | 1.6 GB | Düz sohbette Türkçe akıcı ve anlaşılır. Cevap hızı iyi (tek cümle için yaklaşık 3 sn) |
-
-
 
 Bilgisayarda ayrıca qwen2.5:3b, qwen2.5:7b ve llama3.2:1b indirilmiş durumda; henüz denenmedi.
 
-
-
-\## Rol ve JSON denemesi (gemma2:2b)
-
+## Rol ve JSON denemesi (gemma2:2b)
 Taslak sistem promptu: `docs/model-testi/Modelfile.gemma` (temperature 0.3, JSON çıktı, en fazla 2 Türkçe cümle).
+- JSON geçerli çıktı, `say` ve `action` alanları geldi, Türkçe anlaşılır, emoji yok.
+- İlk denemede masum mazeretlerle (hasta kızım vb.) 4/4 cevap `open_door` oldu.
+- Oyuna uygun hırsız örtü hikâyeleriyle 5 cümlede 4 `open_door`, 1 `deny` oldu.
+- Model bazen oyuncunun cümlesini tekrar ediyor (rol karışıklığı), "içeri girin" gibi yön hataları var.
+- `say` metni ile `action` bazen tutarsız (soru soruyor ama kapıyı açıyor).
 
-\- JSON geçerli çıktı, `say` ve `action` alanları geldi, Türkçe anlaşılır, emoji yok.
+## Çalışma kararı
+- Şimdilik gemma2:2b ile devam: Türkçe kalitesi daha iyi, hafif (6 GB VRAM'e rahat sığar), hızlı.
+- Bu geçici bir karar. Kesin karar 18 Ekim'de 20 cümlelik test ile verilecek (ölçüt: en az 18/20 geçerli JSON ve anlaşılır Türkçe).
+- llama3.2:3b aynı prompt ve cümlelerle henüz karşılaştırılmadı.
 
-\- İlk denemede masum mazeretlerle (hasta kızım vb.) 4/4 cevap `open\_door` oldu.
-
-\- Oyuna uygun hırsız örtü hikâyeleriyle 5 cümlede 4 `open\_door`, 1 `deny` oldu.
-
-\- Model bazen oyuncunun cümlesini tekrar ediyor (rol karışıklığı), "içeri girin" gibi yön hataları var.
-
-\- `say` metni ile `action` bazen tutarsız (soru soruyor ama kapıyı açıyor).
-
-
-
-\## Çalışma kararı
-
-\- Şimdilik gemma2:2b ile devam: Türkçe kalitesi daha iyi, hafif (6 GB VRAM'e rahat sığar), hızlı.
-
-\- Bu geçici bir karar. Kesin karar 18 Ekim'de 20 cümlelik test ile verilecek (ölçüt: en az 18/20 geçerli JSON ve anlaşılır Türkçe).
-
-\- llama3.2:3b aynı prompt ve cümlelerle henüz karşılaştırılmadı.
-
-
-
-\## Prompt iyileştirme fikirleri (v1, 23 Ekim)
-
-\- Oyuncunun hırsız olabileceğini ve görevlinin şüpheci olduğunu açıkça yazmak
-
-\- Oyuncunun içeriden dışarı çıkmak istediğini net belirtmek
-
-\- 2-3 örnek cevap (few-shot) eklemek
-
-\- Oyun tarafında minimum 2 tur şartı: model ilk mesajda `open\_door` dese bile kapı hemen açılmaz
-
+## Prompt iyileştirme fikirleri (v1, 23 Ekim)
+- Oyuncunun hırsız olabileceğini ve görevlinin şüpheci olduğunu açıkça yazmak
+- Oyuncunun içeriden dışarı çıkmak istediğini net belirtmek
+- 2-3 örnek cevap (few-shot) eklemek
+- Oyun tarafında minimum 2 tur şartı: model ilk mesajda `open_door` dese bile kapı hemen açılmaz

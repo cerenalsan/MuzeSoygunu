@@ -56,3 +56,30 @@ Karar
 
 Şimdilik devam (GO) yönünde. Engel testi de geçerse kesinleşir. Plan B: 3D sahne + ortografik kamera + standart NavMesh.
 
+
+## Risk 2: Unity'den yerel Ollama'ya asenkron istek ve Ollama kapalıyken davranış
+
+**Tarih:** 17 Ekim 2026 | **Sorumlu:** Zeynep | **Durum:** İlk test geçti, GO/NO-GO kararı 18 Ekim (20 cümlelik JSON testi)
+
+### Ortam
+- Unity 6.3 LTS (6000.3.25f1)
+- Ollama yerelde, model gemma2:2b, adres http://127.0.0.1:11434
+- Sandbox_Zeynep sahnesi: yazı kutusu, buton, durum metni ve LlmSandboxTester scripti
+
+### Yapılan test
+Yazı kutusundaki mesaj OllamaClient ile asenkron olarak Ollama'ya gönderildi. İstek sürerken durum metninde "Düşünüyor..." gösterildi ve buton pasif yapıldı.
+
+### Sonuç
+- Ollama açıkken: zincir uçtan uca çalıştı (yazı, istek, cevap, ekranda gösterim). Cevaplar Türkçe geldi, ğ ş ı İ ç ö ü karakterleri doğru göründü. Cevap süresi yaklaşık 10 saniye (ilk istek model yüklemesini içerebilir, tam ölçüm 30 Ekim'de).
+- Ollama kapalıyken: "[Sistem] Ollama sunucusuna ulaşılamıyor" mesajı yaklaşık 10 saniye sonra gösterildi. Unity donmadı, Console'da kırmızı hata çıkmadı, buton tekrar tıklanabilir oldu.
+- Ollama tekrar açılınca istek normal şekilde cevaplandı.
+
+### Gözlemler
+- Düz sohbette model rolden çıkabiliyor (örn. "kapıyı açarım" gibi yön karışıklığı). Sandbox'taki sistem promptu tek cümle, gerçek prompt 23 Ekim'de yazılacak.
+- Kapalı sunucuda hata mesajının 10 saniye sonra gelmesinin sebebi araştırılmadı.
+
+### Henüz test edilmeyenler
+- Zaman aşımı (30 sn) yolu
+- Yanlış model adı (ModelNotFound)
+- İstek sırasında kare süresinin Profiler ile ölçümü
+- 20 cümlelik JSON ve Türkçe testi (18 Ekim)

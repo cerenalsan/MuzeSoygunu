@@ -1,5 +1,5 @@
 # Çakışma provası
 
-Bu satırın ilk hâli.
+Bu satırı Ceren değiştirdi.
 
 Bu satıra dokunulmadı.

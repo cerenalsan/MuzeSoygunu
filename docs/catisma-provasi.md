@@ -1,5 +1,5 @@
 # Çakışma provası
 
-Bu satırı Zeynep değiştirdi.
+Bu satırı Ceren ve Zeynep birlikte değiştirdi.
 
 Bu satıra dokunulmadı.

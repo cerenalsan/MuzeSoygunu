@@ -57,3 +57,18 @@ Yazı kutusundaki mesaj OllamaClient ile asenkron olarak Ollama'ya gönderildi. 
 - Yanlış model adı (ModelNotFound)
 - İstek sırasında kare süresinin Profiler ile ölçümü
 - 20 cümlelik JSON ve Türkçe testi (18 Ekim)
+
+## Risk 3: Git çakışması çözülebiliyor mu?
+
+**Tarih:** 18 Ekim 2026 | **Sorumlu:** Ceren ve Zeynep | **Durum:** GO (çözüldü)
+
+### Yapılan test
+docs/catisma-provasi.md dosyasının aynı satırı iki ayrı branch'te (ceren, zeynep) farklı değiştirildi. Zeynep'in PR'ı develop'a merge edildikten sonra Ceren develop'u kendi branch'ine çekti.
+
+### Sonuç
+- Git çakışmayı yakaladı (CONFLICT). Dosyadaki <<<<<<<, ======= ve >>>>>>> işaretleri iki tarafın sürümünü gösterdi.
+- İşaretler silinip birleşik satır yazıldı, git add ve commit ile çözüldü, push edildi.
+- Deneme dosyası sonra silindi, çözüm commit'i geçmişte duruyor.
+
+### Karar
+Çakışma yönetilebilir. Kurallar: bir sahne bir sahip, ortak dosyalar küçük PR'larla değişir, işler karışırsa `git merge --abort` ile geri dönülür.

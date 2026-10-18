@@ -20,3 +20,10 @@
 - **TextMesh Pro Essentials yalnızca Zeynep tarafından import edilir ve commit'lenir; diğer kişi import etmez, develop'tan çeker.**
   Sebep: aynı .meta dosyalarının iki yerde oluşup çakışması. "TMP Examples & Extras" ağır ve gereksiz olduğu için import edilmez.
   Ceren'in sahnelerinde doğrudan yazı gerekmez: ipucu metinleri (ör. "E ile etkileşim") IInteractable üzerinden Zeynep'in HUD'ında gösterilir.
+
+## 18 Ekim 2026
+
+- **Risk 2 (yerel LLM): GO. Çalışma modeli gemma2:2b.**
+  Üç model (gemma2:2b, llama3.2:3b, qwen2.5:3b) aynı sistem promptu ve 20 cümleyle denendi (`docs/model-secimi.md`). Bootcamp ölçütünü (en az 18/20 geçerli JSON ve anlaşılır Türkçe) yalnızca gemma2:2b karşıladı. Unity'den Ollama'ya asenkron istek çalıştı, Ollama kapalıyken Unity donmadı.
+  Açık risk: `action` kararları (itirafta alarm, prompt injection) üç modelde de zayıf; prompt taslak olduğu için nedeni bilinmiyor. 23 Ekim'deki gerçek promptla tekrar ölçülecek, yedek aday qwen2.5:3b (Türkçe daha zayıf, davranış daha iyi).
+  Not: Gemma'nın sohbet şablonunda ayrı bir system rolü yok, sistem promptu ayrı bir user turu olarak gönderiliyor (`ollama show gemma2:2b --template`). Rolden çıkma gözlemiyle ilişkisi test edilmedi.

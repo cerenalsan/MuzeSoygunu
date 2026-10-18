@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MuzeSoygunu
+namespace MuzeSoygunu.Ceren
 {
     public class KameraTakip : MonoBehaviour
     {

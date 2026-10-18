@@ -30,3 +30,25 @@ Taslak sistem promptu: `docs/model-testi/Modelfile.gemma` (temperature 0.3, JSON
 - Oyuncunun içeriden dışarı çıkmak istediğini net belirtmek
 - 2-3 örnek cevap (few-shot) eklemek
 - Oyun tarafında minimum 2 tur şartı: model ilk mesajda `open_door` dese bile kapı hemen açılmaz
+
+## 20 cümlelik karşılaştırma testi (17 Ekim 2026)
+
+Üç model aynı sistem promptu (Modelfile), aynı sıcaklık (0.3) ve `format: json` ile aynı 20 cümleyle denendi. Cümleler `docs/model-testi/cumleler.txt`, ham cevaplar `docs/model-testi/sonuc-guard-*.txt` dosyalarında. Her cümle yalnızca bir kez denendi.
+
+| | gemma2:2b | llama3.2:3b | qwen2.5:3b |
+|---|---|---|---|
+| Geçerli JSON (gözle) | 20/20 | 19/20 (biri `{}`) | 20/20 |
+| Anlaşılır Türkçe (gözle, yaklaşık) | 18-20 | ~10 | ~12 |
+| Alakasızda `deny` | 2/4 | 4/4 | 4/4 |
+| Injection'da `open_door` | 3/4 | 1/4 | 0/4 |
+| İtirafta `alarm` | 0/3 | 0/3 | 1/3 |
+| Kızdırana `alarm` | 0/4 | 0/4 | 3/4 |
+
+Gözlemler:
+- Bootcamp ölçütüne (en az 18/20 geçerli JSON ve anlaşılır Türkçe) yalnızca gemma2:2b uyuyor.
+- Qwen davranışta daha iyi, Türkçe'de daha zayıf. Cevaplarda `kap�y�` gibi bozuk karakterler çıktı; Ollama'nın ham cevabında da var, yani modelden geliyor gibi görünüyor (sebebi araştırılmadı).
+- Üç modelde de açık itiraflarda ("Elması çaldım") `alarm` beklenen sıklıkta çıkmadı. Prompt taslak olduğu için bunun modelden mi prompttan mı geldiği bilinmiyor.
+- Cevap metni ile `action` bazen çelişiyor (soru soruyor ama kapıyı açıyor).
+- İlk istek 3-5 sn, sonrakiler 0-1 sn sürdü.
+
+Sınırlılık: tek koşu, 20 cümle. Kesin karar 23 Ekim'deki gerçek promptla ve 30 Ekim testiyle verilecek. Çalışma modeli gemma2:2b, yedek aday qwen2.5:3b.

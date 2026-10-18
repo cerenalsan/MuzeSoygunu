@@ -1,5 +1,5 @@
 # Çakışma provası
 
-Bu satırın ilk hâli.
+Bu satırı Zeynep değiştirdi.
 
 Bu satıra dokunulmadı.

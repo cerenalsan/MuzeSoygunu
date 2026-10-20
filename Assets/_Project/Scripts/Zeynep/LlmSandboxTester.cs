@@ -18,6 +18,7 @@ namespace MuzeSoygunu.Sandbox
             "Sen bir müzede gece çalışan güvenlik görevlisisin. Kısa ve Türkçe cevap ver.";
 
         private ILlmClient client;
+        private ILlmErrorMessages errorMessages;
         private CancellationTokenSource lifetimeCts;
 
         private void Awake()
@@ -30,6 +31,7 @@ namespace MuzeSoygunu.Sandbox
             }
 
             client = new OllamaClient(settings);
+            errorMessages = new TurkishLlmErrorMessages();
             lifetimeCts = new CancellationTokenSource();
         }
 
@@ -81,7 +83,7 @@ namespace MuzeSoygunu.Sandbox
                 }
                 else
                 {
-                    statusText.text = DescribeError(result.Error);
+                    statusText.text = errorMessages.GetMessage(result.Error);
                     Debug.LogWarning("LLM hatası: " + result.Error + " / " + result.ErrorDetail);
                 }
             }
@@ -96,23 +98,6 @@ namespace MuzeSoygunu.Sandbox
                 {
                     sendButton.interactable = true;
                 }
-            }
-        }
-
-        private static string DescribeError(LlmError error)
-        {
-            switch (error)
-            {
-                case LlmError.ServerUnreachable:
-                    return "[Sistem] Ollama sunucusuna ulaşılamıyor. Ollama'nın açık olduğundan emin olun.";
-                case LlmError.Timeout:
-                    return "[Sistem] Model zamanında cevap vermedi. Lütfen tekrar deneyin.";
-                case LlmError.ModelNotFound:
-                    return "[Sistem] Model bulunamadı. Model adını ve yüklü olup olmadığını kontrol edin.";
-                case LlmError.InvalidResponse:
-                    return "[Sistem] Modelden anlaşılmayan bir cevap geldi. Lütfen tekrar deneyin.";
-                default:
-                    return "[Sistem] Bilinmeyen bir hata oluştu.";
             }
         }
     }

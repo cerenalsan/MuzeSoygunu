@@ -9,6 +9,8 @@ namespace MuzeSoygunu.Llm
     // Hepsi arayüz üzerinden bağlıdır; Unity ya da Ollama'yı doğrudan bilmez.
     public sealed class GuardNpc
     {
+        public const string DialogueEndedMessage = "[Sistem] Diyalog sona erdi.";
+
         private readonly ILlmClient client;
         private readonly IPromptBuilder promptBuilder;
         private readonly INpcReplyParser parser;
@@ -40,9 +42,15 @@ namespace MuzeSoygunu.Llm
         }
 
         // Oyuncunun mesajını işler. Hata durumunda istisna fırlatmaz, sistem mesajı döner.
+        // Diyalog aşaması bittiyse (kazanıldı ya da kaybedildi) mesaj işlenmez, Ollama'ya istek atılmaz.
         // İptal (sahne kapandı) OperationCanceledException olarak çağırana bırakılır.
         public async Task<GuardTurnResult> TalkAsync(string playerMessage, CancellationToken cancellationToken)
         {
+            if (gameState.CurrentStage != GameStage.GuardDialogue)
+            {
+                return GuardTurnResult.FromSystem(DialogueEndedMessage, "Aşama: " + gameState.CurrentStage);
+            }
+
             LlmResult result = await client.SendAsync(promptBuilder.BuildSystemPrompt(), playerMessage, cancellationToken);
 
             if (!result.IsSuccess)

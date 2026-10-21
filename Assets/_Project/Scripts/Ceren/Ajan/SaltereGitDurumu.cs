@@ -34,6 +34,13 @@ namespace MuzeSoygunu.Ceren
                 return;
             }
 
+            Vector2 yon = ((Vector2)nav.steeringTarget - (Vector2)beyin.transform.position).normalized;
+            if (beyin.OnundeMobilEngelVar(yon))
+            {
+                beyin.DurumDegistir(new EngeleBeklemeDurumu(beyin, yon));
+                return;
+            }
+
             float mesafe = Vector2.Distance(beyin.transform.position, beyin.Salter.transform.position);
             if (mesafe <= YaklasmaMesafesi)
                 beyin.DurumDegistir(new SalteriCekDurumu(beyin));

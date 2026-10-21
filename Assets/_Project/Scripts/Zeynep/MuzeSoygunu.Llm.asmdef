@@ -3,7 +3,8 @@
     "rootNamespace": "MuzeSoygunu.Llm",
     "references": [
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "MuzeSoygunu.Shared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

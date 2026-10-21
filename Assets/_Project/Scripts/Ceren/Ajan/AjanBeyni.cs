@@ -33,6 +33,7 @@ namespace MuzeSoygunu.Ceren
 
         private void Update()
         {
+            if (AsamaIlerletici.OyunBitti(GameStateManager.Instance)) return;
             if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
                 mevcutDurum?.EmirAlindi();
 

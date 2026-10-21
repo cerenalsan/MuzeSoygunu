@@ -10,8 +10,7 @@ namespace MuzeSoygunu.Ceren
         [SerializeField] private Color cekilmisRenk = new Color(0.2f, 0.9f, 0.3f, 1f);
 
         public bool Cekildi { get; private set; }
-
-        public string Prompt => Cekildi ? string.Empty : "E ile şalteri çek";
+        public string Prompt => string.Empty;
 
         [ContextMenu("Salteri Cek")]
         public void Interact()

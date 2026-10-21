@@ -4,7 +4,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "MuzeSoygunu.Llm"
+        "MuzeSoygunu.Llm",
+        "MuzeSoygunu.Shared"
     ],
     "includePlatforms": [
         "Editor"

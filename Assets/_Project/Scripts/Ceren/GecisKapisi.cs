@@ -7,21 +7,24 @@ namespace MuzeSoygunu.Ceren
     public class GecisKapisi : MonoBehaviour
     {
         [SerializeField] private GameStage hedefAsama = GameStage.LaserRoom;
+        [SerializeField] private bool elmasGerekli;
 
         private bool kullanildi;
 
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (kullanildi || !other.CompareTag("Player")) return;
-            kullanildi = true;
 
             IGameState durum = GameStateManager.Instance;
-            while (durum.CurrentStage < hedefAsama)
+            if (AsamaIlerletici.OyunBitti(durum)) return;
+            if (elmasGerekli && !durum.DiamondTaken)
             {
-                GameStage onceki = durum.CurrentStage;
-                durum.AdvanceTo((GameStage)((int)onceki + 1));
-                if (durum.CurrentStage == onceki) break;
+                Debug.Log("Gecis kapisi: once elmasi almalisin.");
+                return;
             }
+
+            kullanildi = true;
+            AsamaIlerletici.Ilerlet(durum, hedefAsama);
             Debug.Log("Gecis kapisi: aşama " + durum.CurrentStage);
         }
     }

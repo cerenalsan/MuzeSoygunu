@@ -1,41 +1,26 @@
-using MuzeSoygunu.Shared;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using MuzeSoygunu.Shared;
 
 namespace MuzeSoygunu.Ceren
 {
     public class YakalanmaTepkisi : MonoBehaviour
     {
         [SerializeField] private GorusKonisi kamera;
-        [SerializeField] private float yenidenBaslamaGecikmesi = 1f;
 
         private void OnEnable()
         {
-            if (kamera != null)
-            {
-                kamera.OyuncuYakalandi += Yakalandi;
-            }
+            kamera.OyuncuYakalandi += Yakalandi;
         }
 
         private void OnDisable()
         {
-            if (kamera != null)
-            {
-                kamera.OyuncuYakalandi -= Yakalandi;
-            }
+            kamera.OyuncuYakalandi -= Yakalandi;
         }
 
         private void Yakalandi()
         {
+            Debug.Log("Oyuncu kamera tarafindan yakalandi.");
             GameStateManager.Instance.Lose(LoseReason.CameraCaught);
-            Debug.Log("Oyuncu yakalandi, sahne yeniden baslatiliyor.");
-            Invoke(nameof(SahneyiBastanBaslat), yenidenBaslamaGecikmesi);
-        }
-
-        private void SahneyiBastanBaslat()
-        {
-            GameStateManager.Instance.AdvanceTo(GameStage.Entrance);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }

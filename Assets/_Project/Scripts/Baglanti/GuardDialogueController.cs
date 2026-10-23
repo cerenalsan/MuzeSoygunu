@@ -124,6 +124,18 @@ namespace MuzeSoygunu.Sandbox
 
             player.enabled = false;
 
+            var jump = player.GetComponent<MuzeSoygunu.Ceren.ZiplamaYetenegi>();
+            if (jump != null)
+            {
+                jump.enabled = false;
+            }
+
+            var interaction = player.GetComponent<MuzeSoygunu.Ceren.OyuncuEtkilesimi>();
+            if (interaction != null)
+            {
+                interaction.enabled = false;
+            }
+
             var body = player.GetComponent<Rigidbody2D>();
             if (body != null)
             {

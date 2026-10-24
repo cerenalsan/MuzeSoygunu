@@ -13,3 +13,7 @@ Sandbox_Zeynep sahnesinde LlmSandboxTester ile, gemma2:2b modeliyle denendi. Mes
 ## Henüz denenmeyenler
 - InvalidResponse (geçersiz cevap): ayrıştırıcı birim testlerle kapsandı (9 test), ancak sandbox'ta ayrıştırıcı henüz bağlı değil. GuardNpc yazılınca (21 Ekim) ekranda denenecek.
 - İstek sırasında kare süresinin Profiler ile ölçümü.
+
+## 23 Ekim 2026: InvalidResponse gerçek akışta görüldü
+
+03_Cikis sahnesinde, GuardDialogueController ve gerçek Ollama ile: model `"action": "ask"` döndürdü. JsonNpcReplyParser bilinmeyen değeri reddetti, oyuncuya "[Sistem] Modelden anlaşılmayan bir cevap geldi. Lütfen tekrar deneyin." gösterildi, Console'a `InvalidResponse: Bilinmeyen ya da eksik "action" değeri: ask` yazıldı. Oyun çökmedi, sahte NPC cevabı gösterilmedi. Sebep araştırılmadı (v0 prompt'taki "ask a question" ifadesiyle ilgisi test edilmedi).

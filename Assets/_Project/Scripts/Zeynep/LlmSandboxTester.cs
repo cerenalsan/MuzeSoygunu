@@ -75,7 +75,7 @@ namespace MuzeSoygunu.Sandbox
 
             try
             {
-                LlmResult result = await client.SendAsync(systemPrompt, message, lifetimeCts.Token);
+                LlmResult result = await client.SendAsync(systemPrompt, new[] { new ChatTurn(ChatRole.User, message) }, lifetimeCts.Token);
 
                 if (result.IsSuccess)
                 {

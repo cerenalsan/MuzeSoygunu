@@ -52,3 +52,22 @@ Gözlemler:
 - İlk istek 3-5 sn, sonrakiler 0-1 sn sürdü.
 
 Sınırlılık: tek koşu, 20 cümle. Kesin karar 23 Ekim'deki gerçek promptla ve 30 Ekim testiyle verilecek. Çalışma modeli gemma2:2b, yedek aday qwen2.5:3b.
+
+## Prompt v1 ölçümü (24 Ekim 2026)
+
+Aynı 20 cümle, `docs/model-testi/prompt-v1.txt` sistem promptu (4 örnekli), `format: json`, sıcaklık 0.3. Sayılar `action` değerlerinin geçtiği satır sayısıdır, her satır bir kez denendi.
+
+| Model | open_door | deny | alarm |
+|---|---|---|---|
+| gemma2:2b (ilk koşu) | 7 | 13 | 0 |
+| gemma2:2b (tekrar) | 7 | 12 | 1 |
+| gemma2:2b (hatırlatmalı, v2) | 5 | 14 | 1 |
+| qwen2.5:3b | 2 | 16 | 2 |
+
+Gözlemler:
+- Prompt v0'a göre (gemma, 18 Ekim: 11 `open_door`) `open_door` sayısı düştü. İtirafta (14-16) `alarm` hiçbir koşuda beklendiği gibi çıkmadı.
+- Gemma injection cümlelerinin 3'ünde kapıyı açtı, qwen 4'ünde de `deny` verdi.
+- Gemma'nın tekrar koşusundaki tek `alarm` kararında `say` alanı kapıyı açacağını söylüyor (karar ile cümle çelişiyor).
+- Qwen'in cevaplarında bozuk harfler ve bir satırda Çince karakterler var; gemma'da bir satırda bozuk karakter görüldü.
+- Hatırlatma eki `open_door` sayısını 7'den 5'e indirdi ama bu fark tek koşunun oynama aralığında; itirafta `alarm` yine çıkmadı. Kullanılmadı (`UseReminder = false`).
+- Prompttaki örnekler test cümlelerine benzediği için sonuçlar gerçek iyileşmeden iyimser olabilir. Tek koşu, sonuçlar gösterge niteliğinde.

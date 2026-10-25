@@ -32,3 +32,9 @@
 
 - **Scripts/Shared klasörüne MuzeSoygunu.Shared assembly definition eklendi.**
   Zeynep'in MuzeSoygunu.Llm assembly'sinin IGameState gibi ortak arayüzlere erişebilmesi için gerekti. Koşullar (Ceren): yalnızca asmdef ve .meta eklenir, hiçbir script taşınmaz ya da değişmez; Shared'da yalnızca arayüz ve enum kalır; Llm asmdef Shared'a referans verir. GameStateManager Assembly-CSharp'ta kaldığı için Llm içinden erişilemez: GuardNpc IGameState'i constructor ile dışarıdan alır, bağlantıyı Assembly-CSharp'taki bir sahne bileşeni yapar.
+
+## 25 Ekim 2026
+
+- **Konuşma geçmişi son 6 mesaj (3 tur), oyuncu tur sınırı 10.** Sınır aşılınca oyuncu `GuardRefused` ile kaybeder ve Ollama'ya istek atılmaz. Başarısız istekler geçmişe ve tur sayacına yazılmaz. Geçmişe modelin ham JSON cevabı yazılır.
+- **OllamaClient isteğe `format: json` ekliyor.** Test scriptlerimiz ekliyordu, oyundaki istemci eklemiyordu.
+- **Sistem promptu v1 `GuardPromptBuilder`'da.** Hatırlatma eki ölçümde belirgin fayda göstermediği için kapalı (`UseReminder = false`). Prompt dondurma 29 Ekim'de.

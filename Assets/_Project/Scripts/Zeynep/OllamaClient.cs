@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -21,10 +22,10 @@ namespace MuzeSoygunu.Llm
             this.settings = settings;
         }
 
-        public async Task<LlmResult> SendAsync(string systemPrompt, string userMessage, CancellationToken cancellationToken)
+        public async Task<LlmResult> SendAsync(string systemPrompt, IReadOnlyList<ChatTurn> messages, CancellationToken cancellationToken)
         {
             string url = settings.BaseUrl.TrimEnd('/') + "/api/chat";
-            string requestJson = BuildRequestJson(systemPrompt, userMessage);
+            string requestJson = BuildRequestJson(systemPrompt, messages);
 
             using (var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
@@ -71,18 +72,27 @@ namespace MuzeSoygunu.Llm
             }
         }
 
-        private string BuildRequestJson(string systemPrompt, string userMessage)
+        private string BuildRequestJson(string systemPrompt, IReadOnlyList<ChatTurn> messages)
         {
+            var list = new ChatMessage[messages.Count + 1];
+            list[0] = new ChatMessage { role = "system", content = systemPrompt };
+
+            for (int i = 0; i < messages.Count; i++)
+            {
+                list[i + 1] = new ChatMessage
+                {
+                    role = messages[i].Role == ChatRole.User ? "user" : "assistant",
+                    content = messages[i].Content
+                };
+            }
+
             var request = new ChatRequest
             {
                 model = settings.ModelName,
                 stream = false,
+                format = "json",
                 options = new ChatOptions { temperature = settings.Temperature },
-                messages = new[]
-                {
-                    new ChatMessage { role = "system", content = systemPrompt },
-                    new ChatMessage { role = "user", content = userMessage }
-                }
+                messages = list
             };
 
             return JsonUtility.ToJson(request);
@@ -128,6 +138,7 @@ namespace MuzeSoygunu.Llm
             public string model;
             public ChatMessage[] messages;
             public bool stream;
+            public string format;
             public ChatOptions options;
         }
 

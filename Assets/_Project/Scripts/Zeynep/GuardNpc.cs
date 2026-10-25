@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MuzeSoygunu.Shared;
@@ -10,6 +11,7 @@ namespace MuzeSoygunu.Llm
     public sealed class GuardNpc
     {
         public const string DialogueEndedMessage = "[Sistem] Diyalog sona erdi.";
+        public const string TurnLimitMessage = "[Sistem] Güvenlik görevlisi sabrını yitirdi ve seni dışarı bırakmayacak.";
 
         private readonly ILlmClient client;
         private readonly IPromptBuilder promptBuilder;
@@ -17,6 +19,7 @@ namespace MuzeSoygunu.Llm
         private readonly GameActionFactory actionFactory;
         private readonly IGameState gameState;
         private readonly ILlmErrorMessages errorMessages;
+        private readonly DialogueSession session;
 
         public GuardNpc(
             ILlmClient client,
@@ -24,7 +27,8 @@ namespace MuzeSoygunu.Llm
             INpcReplyParser parser,
             GameActionFactory actionFactory,
             IGameState gameState,
-            ILlmErrorMessages errorMessages)
+            ILlmErrorMessages errorMessages,
+            DialogueSession session)
         {
             if (client == null) throw new ArgumentNullException(nameof(client));
             if (promptBuilder == null) throw new ArgumentNullException(nameof(promptBuilder));
@@ -32,6 +36,7 @@ namespace MuzeSoygunu.Llm
             if (actionFactory == null) throw new ArgumentNullException(nameof(actionFactory));
             if (gameState == null) throw new ArgumentNullException(nameof(gameState));
             if (errorMessages == null) throw new ArgumentNullException(nameof(errorMessages));
+            if (session == null) throw new ArgumentNullException(nameof(session));
 
             this.client = client;
             this.promptBuilder = promptBuilder;
@@ -39,10 +44,11 @@ namespace MuzeSoygunu.Llm
             this.actionFactory = actionFactory;
             this.gameState = gameState;
             this.errorMessages = errorMessages;
+            this.session = session;
         }
 
         // Oyuncunun mesajını işler. Hata durumunda istisna fırlatmaz, sistem mesajı döner.
-        // Diyalog aşaması bittiyse (kazanıldı ya da kaybedildi) mesaj işlenmez, Ollama'ya istek atılmaz.
+        // Diyalog aşaması bittiyse mesaj işlenmez. Tur sınırı aşılırsa oyuncu kaybeder ve Ollama'ya istek atılmaz.
         // İptal (sahne kapandı) OperationCanceledException olarak çağırana bırakılır.
         public async Task<GuardTurnResult> TalkAsync(string playerMessage, CancellationToken cancellationToken)
         {
@@ -51,7 +57,16 @@ namespace MuzeSoygunu.Llm
                 return GuardTurnResult.FromSystem(DialogueEndedMessage, "Aşama: " + gameState.CurrentStage);
             }
 
-            LlmResult result = await client.SendAsync(promptBuilder.BuildSystemPrompt(), playerMessage, cancellationToken);
+            if (session.IsTurnLimitReached)
+            {
+                gameState.Lose(LoseReason.GuardRefused);
+                return GuardTurnResult.FromSystem(TurnLimitMessage, "Tur sınırı: " + session.PlayerTurns);
+            }
+
+            var messages = new List<ChatTurn>(session.Messages);
+            messages.Add(new ChatTurn(ChatRole.User, WithReminder(playerMessage)));
+
+            LlmResult result = await client.SendAsync(promptBuilder.BuildSystemPrompt(), messages, cancellationToken);
 
             if (!result.IsSuccess)
             {
@@ -71,8 +86,15 @@ namespace MuzeSoygunu.Llm
                 return InvalidResponse("Bilinmeyen eylem: " + reply.Action);
             }
 
+            session.Record(playerMessage, result.Content);
             action.Execute(gameState);
             return GuardTurnResult.FromNpc(reply.Say, reply.Action);
+        }
+
+        private string WithReminder(string playerMessage)
+        {
+            string reminder = promptBuilder.BuildReminder();
+            return string.IsNullOrEmpty(reminder) ? playerMessage : playerMessage + "\n\n" + reminder;
         }
 
         private GuardTurnResult InvalidResponse(string detail)

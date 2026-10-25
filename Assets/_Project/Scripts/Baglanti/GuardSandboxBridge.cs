@@ -59,7 +59,8 @@ namespace MuzeSoygunu.Sandbox
                 new JsonNpcReplyParser(),
                 new GameActionFactory(door, denialCounter),
                 state,
-                new TurkishLlmErrorMessages());
+                new TurkishLlmErrorMessages(),
+                DialogueSession.CreateDefault());
 
             lifetimeCts = new CancellationTokenSource();
             sendButton.onClick.AddListener(OnSendClicked);

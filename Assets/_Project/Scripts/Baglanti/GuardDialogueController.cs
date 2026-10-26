@@ -56,7 +56,8 @@ namespace MuzeSoygunu.Sandbox
                 new JsonNpcReplyParser(),
                 new GameActionFactory(exitDoor, new DenialCounter(maxDenials)),
                 state,
-                new TurkishLlmErrorMessages());
+                new TurkishLlmErrorMessages(),
+                DialogueSession.CreateDefault());
 
             view = dialogueUI;
             view.MessageSubmitted += OnMessageSubmitted;

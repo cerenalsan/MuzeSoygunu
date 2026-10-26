@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using MuzeSoygunu.Llm;
 using MuzeSoygunu.Shared;
@@ -7,7 +8,7 @@ using MuzeSoygunu.Shared;
 namespace MuzeSoygunu.Sandbox
 {
     // Çıkış koridorunda güvenlikle diyaloğu yönetir. Assembly-CSharp'ta durur çünkü
-    // GameStateManager.Instance ve PlayerController'a buradan erişilir.
+    // GameStateManager.Instance ve Ceren'in oyuncu bileşenlerine buradan erişilir.
     [RequireComponent(typeof(Collider2D))]
     public class GuardDialogueController : MonoBehaviour
     {
@@ -19,10 +20,13 @@ namespace MuzeSoygunu.Sandbox
 
         private IGameState state;
         private IDialogueView view;
+        private ILlmHealth health;
         private GuardNpc guard;
         private CancellationTokenSource lifetimeCts;
+        private string lastMessage;
         private bool started;
         private bool finished;
+        private bool busy;
 
         private void Start()
         {
@@ -50,6 +54,8 @@ namespace MuzeSoygunu.Sandbox
             DevShortcut(state);
 #endif
 
+            health = new LlmHealthCheck(settings);
+
             guard = new GuardNpc(
                 new OllamaClient(settings),
                 new GuardPromptBuilder(),
@@ -61,6 +67,7 @@ namespace MuzeSoygunu.Sandbox
 
             view = dialogueUI;
             view.MessageSubmitted += OnMessageSubmitted;
+            view.RetryRequested += OnRetryRequested;
             lifetimeCts = new CancellationTokenSource();
         }
 
@@ -71,6 +78,7 @@ namespace MuzeSoygunu.Sandbox
             if (view != null)
             {
                 view.MessageSubmitted -= OnMessageSubmitted;
+                view.RetryRequested -= OnRetryRequested;
             }
 
             if (lifetimeCts != null)
@@ -90,7 +98,7 @@ namespace MuzeSoygunu.Sandbox
             BeginDialogue();
         }
 
-        private void BeginDialogue()
+        private async void BeginDialogue()
         {
             if (state.CurrentStage == GameStage.Corridor)
             {
@@ -111,10 +119,46 @@ namespace MuzeSoygunu.Sandbox
             SceneFlowBridge.LoadDelaySeconds = sceneChangeDelaySeconds;
             dialogueUI.Show();
             view.ShowSystemMessage("[Sistem] Güvenlik görevlisi yolunu kesti. Ona bir şey yaz.");
+
+            await CheckHealthAsync(false);
         }
 
-        // PlayerController klavyeyi doğrudan okuduğu için yazı yazarken karakter yürümesin.
-        // Ceren'in dosyasına dokunmadan bileşen kapatılır ve hız sıfırlanır.
+        // Ollama hazır değilse oyuncuya Türkçe sistem mesajı ve "Tekrar dene" düğmesi gösterir.
+        private async Task CheckHealthAsync(bool announceReady)
+        {
+            busy = true;
+
+            try
+            {
+                LlmHealthStatus status = await health.CheckAsync(lifetimeCts.Token);
+
+                if (status == LlmHealthStatus.Ready)
+                {
+                    view.SetRetryVisible(false);
+                    if (announceReady)
+                    {
+                        view.ShowSystemMessage("[Sistem] Ollama hazır.");
+                    }
+                }
+                else
+                {
+                    view.ShowSystemMessage(LlmHealthMessages.For(status, settings.ModelName));
+                    view.SetRetryVisible(true);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            finally
+            {
+                busy = false;
+            }
+        }
+
+        // PlayerController, ZiplamaYetenegi ve OyuncuEtkilesimi klavyeyi doğrudan okuduğu için
+        // yazı yazarken karakter yürümesin, zıplamasın, etkileşime girmesin.
+        // Ceren'in dosyalarına dokunmadan bileşenler kapatılır ve hız sıfırlanır.
         private static void FreezePlayer()
         {
             var player = FindFirstObjectByType<MuzeSoygunu.Ceren.PlayerController>();
@@ -151,7 +195,31 @@ namespace MuzeSoygunu.Sandbox
                 return;
             }
 
+            lastMessage = text;
             view.ShowPlayerMessage(text);
+            await TalkAsync(text);
+        }
+
+        // Başarısız son mesajı yeniden gönderir; henüz hiç mesaj yoksa sağlık kontrolünü tekrarlar.
+        private async void OnRetryRequested()
+        {
+            if (finished || busy)
+            {
+                return;
+            }
+
+            if (lastMessage == null)
+            {
+                await CheckHealthAsync(true);
+                return;
+            }
+
+            await TalkAsync(lastMessage);
+        }
+
+        private async Task TalkAsync(string text)
+        {
+            busy = true;
             view.SetBusy(true);
 
             try
@@ -161,11 +229,13 @@ namespace MuzeSoygunu.Sandbox
                 if (turn.IsSystemMessage)
                 {
                     view.ShowSystemMessage(turn.Text);
+                    view.SetRetryVisible(true);
                     Debug.LogWarning("Sistem mesajı: " + turn.TechnicalDetail);
                 }
                 else
                 {
                     view.ShowNpcMessage(turn.Text);
+                    view.SetRetryVisible(false);
                 }
             }
             catch (OperationCanceledException)
@@ -174,6 +244,8 @@ namespace MuzeSoygunu.Sandbox
             }
             finally
             {
+                busy = false;
+
                 if (this != null && dialogueUI != null)
                 {
                     view.SetBusy(false);

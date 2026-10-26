@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MuzeSoygunu.Llm
 {
-    // Diyalog ekranı: sohbet geçmişi, yazı kutusu, gönder düğmesi ve "Düşünüyor...". IDialogueView uygular.
+    // Diyalog ekranı: sohbet geçmişi, yazı kutusu, gönder ve tekrar dene düğmeleri, "Düşünüyor...". IDialogueView uygular.
     // Bu bileşen panelin kendisinde değil, her zaman açık kalan bir üst nesnede durmalıdır.
     public class DialogueUI : MonoBehaviour, IDialogueView
     {
@@ -15,6 +15,7 @@ namespace MuzeSoygunu.Llm
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private TMP_InputField inputField;
         [SerializeField] private Button sendButton;
+        [SerializeField] private Button retryButton; // isteğe bağlı
         [SerializeField, Min(1)] private int maxLines = 8;
 
         private readonly List<string> lines = new List<string>();
@@ -22,6 +23,7 @@ namespace MuzeSoygunu.Llm
         private bool locked;
 
         public event Action<string> MessageSubmitted;
+        public event Action RetryRequested;
 
         private void Awake()
         {
@@ -42,6 +44,12 @@ namespace MuzeSoygunu.Llm
             sendButton.onClick.AddListener(Submit);
             inputField.onSubmit.AddListener(OnInputSubmit);
 
+            if (retryButton != null)
+            {
+                retryButton.onClick.AddListener(OnRetryClicked);
+                retryButton.gameObject.SetActive(false);
+            }
+
             chatText.text = string.Empty;
             statusText.text = string.Empty;
             Hide();
@@ -51,6 +59,7 @@ namespace MuzeSoygunu.Llm
         {
             if (sendButton != null) sendButton.onClick.RemoveListener(Submit);
             if (inputField != null) inputField.onSubmit.RemoveListener(OnInputSubmit);
+            if (retryButton != null) retryButton.onClick.RemoveListener(OnRetryClicked);
         }
 
         public void Show()
@@ -70,6 +79,7 @@ namespace MuzeSoygunu.Llm
             locked = true;
             inputField.interactable = false;
             sendButton.interactable = false;
+            SetRetryVisible(false);
         }
 
         public void ShowPlayerMessage(string text)
@@ -92,6 +102,11 @@ namespace MuzeSoygunu.Llm
             busy = isBusy;
             statusText.text = isBusy ? "Düşünüyor..." : string.Empty;
 
+            if (retryButton != null)
+            {
+                retryButton.interactable = !isBusy;
+            }
+
             if (locked)
             {
                 return;
@@ -103,6 +118,28 @@ namespace MuzeSoygunu.Llm
             if (!isBusy && panel.activeInHierarchy)
             {
                 inputField.ActivateInputField();
+            }
+        }
+
+        public void SetRetryVisible(bool visible)
+        {
+            if (retryButton != null)
+            {
+                retryButton.gameObject.SetActive(visible && !locked);
+            }
+        }
+
+        private void OnRetryClicked()
+        {
+            if (busy || locked)
+            {
+                return;
+            }
+
+            Action handler = RetryRequested;
+            if (handler != null)
+            {
+                handler();
             }
         }
 

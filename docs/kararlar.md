@@ -27,3 +27,14 @@
   Üç model (gemma2:2b, llama3.2:3b, qwen2.5:3b) aynı sistem promptu ve 20 cümleyle denendi (`docs/model-secimi.md`). Bootcamp ölçütünü (en az 18/20 geçerli JSON ve anlaşılır Türkçe) yalnızca gemma2:2b karşıladı. Unity'den Ollama'ya asenkron istek çalıştı, Ollama kapalıyken Unity donmadı.
   Açık risk: `action` kararları (itirafta alarm, prompt injection) üç modelde de zayıf; prompt taslak olduğu için nedeni bilinmiyor. 23 Ekim'deki gerçek promptla tekrar ölçülecek, yedek aday qwen2.5:3b (Türkçe daha zayıf, davranış daha iyi).
   Not: Gemma'nın sohbet şablonunda ayrı bir system rolü yok, sistem promptu ayrı bir user turu olarak gönderiliyor (`ollama show gemma2:2b --template`). Rolden çıkma gözlemiyle ilişkisi test edilmedi.
+
+## 21 Ekim 2026
+
+- **Scripts/Shared klasörüne MuzeSoygunu.Shared assembly definition eklendi.**
+  Zeynep'in MuzeSoygunu.Llm assembly'sinin IGameState gibi ortak arayüzlere erişebilmesi için gerekti. Koşullar (Ceren): yalnızca asmdef ve .meta eklenir, hiçbir script taşınmaz ya da değişmez; Shared'da yalnızca arayüz ve enum kalır; Llm asmdef Shared'a referans verir. GameStateManager Assembly-CSharp'ta kaldığı için Llm içinden erişilemez: GuardNpc IGameState'i constructor ile dışarıdan alır, bağlantıyı Assembly-CSharp'taki bir sahne bileşeni yapar.
+
+## 25 Ekim 2026
+
+- **Konuşma geçmişi son 6 mesaj (3 tur), oyuncu tur sınırı 10.** Sınır aşılınca oyuncu `GuardRefused` ile kaybeder ve Ollama'ya istek atılmaz. Başarısız istekler geçmişe ve tur sayacına yazılmaz. Geçmişe modelin ham JSON cevabı yazılır.
+- **OllamaClient isteğe `format: json` ekliyor.** Test scriptlerimiz ekliyordu, oyundaki istemci eklemiyordu.
+- **Sistem promptu v1 `GuardPromptBuilder`'da.** Hatırlatma eki ölçümde belirgin fayda göstermediği için kapalı (`UseReminder = false`). Prompt dondurma 29 Ekim'de.

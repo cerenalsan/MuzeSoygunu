@@ -38,3 +38,8 @@
 - **Konuşma geçmişi son 6 mesaj (3 tur), oyuncu tur sınırı 10.** Sınır aşılınca oyuncu `GuardRefused` ile kaybeder ve Ollama'ya istek atılmaz. Başarısız istekler geçmişe ve tur sayacına yazılmaz. Geçmişe modelin ham JSON cevabı yazılır.
 - **OllamaClient isteğe `format: json` ekliyor.** Test scriptlerimiz ekliyordu, oyundaki istemci eklemiyordu.
 - **Sistem promptu v1 `GuardPromptBuilder`'da.** Hatırlatma eki ölçümde belirgin fayda göstermediği için kapalı (`UseReminder = false`). Prompt dondurma 29 Ekim'de.
+
+## 28 Ekim 2026
+
+- **Model ısıtma:** 03_Cikis'e girince boş bir sohbet isteğiyle model belleğe yüklenir (`keep_alive` 10 dakika), süre `LlmSettings.WarmupTimeoutSeconds`'tan okunur. Yapılan testlerde ısınma sonrası ilk yanıt yaklaşık 1 saniyede alınmıştır; Ollama kapalı olduğunda ise sistem "ısınma başarısız" uyarısı verip kullanıcının Ollama'yı açmasını bildirir. Başarısızlıklar sessizce ele alınır, Ollama sorunları sağlık kontrolü ve istek hatalarıyla yönetilir.
+- **Ekran ipuçları:** Ceren'in sahnelerine dokunmadan, oyun açılırken kendiliğinden oluşan `HudHints` bileşeniyle çalışır (aşamaya göre metin, `HintTexts`).

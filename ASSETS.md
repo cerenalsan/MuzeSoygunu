@@ -19,4 +19,13 @@ Kordon (kadife ip bariyeri), sergi sandığı ve kör nokta halısı Unity'nin y
 
 ## Sesler
 
-Zeynep tarafından eklenecek.
+| Asset | Kaynak | Lisans | Nerede kullanıldı | Dosya |
+|---|---|---|---|---|
+| Buton tıkı | https://freesound.org/people/Jaszunio15/sounds/421475/ | CC0 | Menü, sonuç ve diyalog butonları | `Assets/_Project/Audio/click.wav` |
+| Alarm | https://freesound.org/people/nikkolaus/sounds/442563/ | CC0 | Güvenlik alarm çaldığında (en fazla 3 sn) | `Assets/_Project/Audio/alarm.wav` |
+| Kazanma | https://freesound.org/people/MLaudio/sounds/615099/ | CC0 | Oyun kazanıldığında | `Assets/_Project/Audio/win.wav` |
+| Kaybetme | https://freesound.org/people/suntemple/sounds/253174/ | CC0 | Oyun kaybedildiğinde | `Assets/_Project/Audio/lose.wav` |
+| Adım | https://freesound.org/people/Fission9/sounds/521590/ | CC0 | Oyuncu yürürken | `Assets/_Project/Audio/step.wav` |
+
+Ses dosyaları `Assets/_Project/Resources/SoundBank.asset` üzerinden `AudioManager` ile çalınır. Ses kapalı ya da dosya eksikken oyun hata vermeden sessiz çalışır (F8 ile sessize alınır).
+

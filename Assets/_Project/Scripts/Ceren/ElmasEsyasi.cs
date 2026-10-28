@@ -20,7 +20,10 @@ namespace MuzeSoygunu.Ceren
             AsamaIlerletici.Ilerlet(durum, GameStage.Diamond);
             durum.MarkDiamondTaken();
 
-            GetComponent<SpriteRenderer>().enabled = false;
+            foreach (SpriteRenderer gorsel in GetComponentsInChildren<SpriteRenderer>())
+            {
+                gorsel.enabled = false;
+            }
             Debug.Log("Elmas alindi, aşama: " + durum.CurrentStage);
         }
     }

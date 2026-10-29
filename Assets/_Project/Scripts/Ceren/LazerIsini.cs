@@ -7,14 +7,14 @@ namespace MuzeSoygunu.Ceren
     public class LazerIsini : MonoBehaviour, IToggleable
     {
         private Collider2D govde;
-        private SpriteRenderer gorsel;
+        private SpriteRenderer[] gorseller;
 
         public bool IsOn { get; private set; } = true;
 
         private void Awake()
         {
             govde = GetComponent<Collider2D>();
-            gorsel = GetComponent<SpriteRenderer>();
+            gorseller = GetComponentsInChildren<SpriteRenderer>();
             Uygula();
         }
 
@@ -33,7 +33,7 @@ namespace MuzeSoygunu.Ceren
         private void Uygula()
         {
             govde.enabled = IsOn;
-            gorsel.enabled = IsOn;
+            foreach (SpriteRenderer g in gorseller) g.enabled = IsOn;
         }
 
         private void OnTriggerStay2D(Collider2D other)

@@ -77,7 +77,26 @@ flowchart TD
 
 ### 2.3 Parametreler
 
-_(parametre tablosu buraya)_
+Ajan davranışını belirleyen değerler. Inspector'dan değiştirilebilenler `AjanBeyni` ve `NavMeshAgent` bileşenlerindedir, diğerleri durum sınıflarında sabittir (`const`).
+
+| Parametre | Değer | Birim | Tanımlandığı yer | Anlamı |
+|---|---|---|---|---|
+| `takipMesafesi` | 2 | m | `AjanBeyni` (Inspector) | Oyuncuya bu mesafeden uzaksa ajan takip eder, yakınsa durur |
+| `sensorMenzili` | 4 | m | `AjanBeyni` (Inspector) | Her ışının uzunluğu |
+| `beklemeMesafesi` | 2 | m | `AjanBeyni` (Inspector) | Mobil engel bu mesafeye girerse ajan bekleme durumuna geçer |
+| Işın sayısı ve açıları | 5 ışın: -60, -30, 0, +30, +60 | derece | `RaycastSensor` | Gidiş yönüne göre yelpaze tarama |
+| `EnAzBeklemeSuresi` | 0.5 | sn | `EngeleBeklemeDurumu` | Engel kalksa bile en az bu kadar bekler |
+| `GeriCekilmeMesafesi` | 1.2 | m | `EngeleBeklemeDurumu` | Engel bundan yakınsa ajan geri çekilir |
+| `GeriCekilmeAdimi` | 1.5 | m | `EngeleBeklemeDurumu` | Geri çekilirken gidilecek mesafe |
+| `YaklasmaMesafesi` | 1 | m | `SaltereGitDurumu` | Şaltere bu kadar yaklaşınca şalteri çekmeye başlar |
+| `CekmeSuresi` | 1 | sn | `SalteriCekDurumu` | Şalteri çekmeden önce bekleme süresi |
+| Emir tuşu | Q | - | `AjanBeyni` | Ajana "şalteri çek" emrini verir |
+| `Speed` | 3.5 | m/sn | `NavMeshAgent` | Hareket hızı (oyuncu 5 m/sn) |
+| `Angular Speed` | 120 | derece/sn | `NavMeshAgent` | Dönüş hızı |
+| `Acceleration` | 14 | m/sn² | `NavMeshAgent` | İvme |
+| `Stopping Distance` | 0 | m | `NavMeshAgent` | Hedefe varış toleransı |
+| `Radius` / `Height` | 0.5 / 1 | m | `NavMeshAgent` | Ajan boyutu, NavMesh sınırlarını belirler |
+| `Auto Braking` | Açık | - | `NavMeshAgent` | Hedefe yaklaşırken yavaşlar |
 
 ### 2.4 Sınıf Diyagramı ve SOLID
 

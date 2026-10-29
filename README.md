@@ -20,7 +20,28 @@ _Yazılacak: oyunun akışı, gerekli yazılımlar (Unity sürümü, Ollama), ç
 
 ### 2.1 Durum Diyagramı
 
-_(durum diyagramı buraya)_
+Ajan (`AjanBeyni`) State Pattern ile çalışır. Her durum `IAjanDurumu` arayüzünü gerçekler (`Gir`, `Guncelle`, `Cik`, `EmirAlindi`). Durum geçişleri `DurumDegistir` üzerinden yapılır ve her geçiş konsola `[Ajan] eski -> yeni` olarak yazılır.
+
+```mermaid
+stateDiagram-v2
+    [*] --> FollowPlayer
+    FollowPlayer --> MoveToSwitch : Q emri (salter cekilmemisse)
+    MoveToSwitch --> FollowPlayer : salter icin yol bulunamadi
+    MoveToSwitch --> WaitForObstacle : yonunde mobil engel var
+    MoveToSwitch --> PullSwitch : salter 1 m yakinda
+    WaitForObstacle --> WaitForObstacle : engel 1.2 m den yakin, geri cekil
+    WaitForObstacle --> MoveToSwitch : engel kalkti (en az 0.5 sn bekledikten sonra)
+    PullSwitch --> Done : 1 sn sonra salteri cek
+    Done --> [*]
+```
+
+| Durum | Log adı | Davranış |
+|---|---|---|
+| `OyuncuyuTakipDurumu` | `FollowPlayer` | Oyuncu 2 m'den uzaksa NavMesh ile oyuncuya gider, yakınsa durur |
+| `SaltereGitDurumu` | `MoveToSwitch` | Şaltere yürür, her karede önünü sensörle tarar |
+| `EngeleBeklemeDurumu` | `WaitForObstacle` | Mobil engel varken durur, engel 1.2 m'den yakınsa 1.5 birim geri çekilir |
+| `SalteriCekDurumu` | `PullSwitch` | 1 sn bekler, `Salter.Interact()` çağırır |
+| `BittiDurumu` | `Done` | Görev bitti, hiçbir şey yapmaz |
 
 ### 2.2 Sensör ve Algı
 

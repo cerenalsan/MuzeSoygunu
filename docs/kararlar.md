@@ -43,3 +43,21 @@
 
 - **Model ısıtma:** 03_Cikis'e girince boş bir sohbet isteğiyle model belleğe yüklenir (`keep_alive` 10 dakika), süre `LlmSettings.WarmupTimeoutSeconds`'tan okunur. Yapılan testlerde ısınma sonrası ilk yanıt yaklaşık 1 saniyede alınmıştır; Ollama kapalı olduğunda ise sistem "ısınma başarısız" uyarısı verip kullanıcının Ollama'yı açmasını bildirir. Başarısızlıklar sessizce ele alınır, Ollama sorunları sağlık kontrolü ve istek hatalarıyla yönetilir.
 - **Ekran ipuçları:** Ceren'in sahnelerine dokunmadan, oyun açılırken kendiliğinden oluşan `HudHints` bileşeniyle çalışır (aşamaya göre metin, `HintTexts`).
+
+## Karar: LLM modeli gemma3:4b olarak belirlendi
+
+## 29 Ekim 2026
+
+- **Bağlam**
+Önceki model `gemma2:2b` Türkçe'de kelime ve cümle hataları yapıyordu. Daha iyi aday arandı.
+
+- **Denenen adaylar**
+- `gemma3:4b`: demo makinesinde (6 GB VRAM) 100% GPU, Türkçe akıcı.
+- `gemma4:e4b`: demo makinesinde çok yavaş, elendi.
+- `gemma2:2b`: önceki model, baz çizgi olarak tutuldu.
+
+- **Karar**
+`gemma3:4b` kullanılacak. Model adı `LlmSettings.asset` içindeki `modelName` alanından değişir. Geri dönüş tek satırdır.
+
+- **Sonuçlar**
+JSON geçerliliği, `action` doğruluğu ve süre ölçümleri `docs/model-testi/sonuc-v2-gemma3-4b.txt` dosyasındadır.

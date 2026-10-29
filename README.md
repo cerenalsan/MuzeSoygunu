@@ -45,7 +45,35 @@ stateDiagram-v2
 
 ### 2.2 Sensör ve Algı
 
-_(sensör akışı buraya)_
+Algı katmanı `ISensor` arayüzü arkasındadır. `RaycastSensor`, ajanın gidiş yönüne göre yelpaze şeklinde 5 ışın atar ve her ışın için bir `SensorOlcumu` üretir (açı, normalize mesafe, tür). Karar mantığı `AjanBeyni.OnundeMobilEngelVar` içindedir; ajan sadece mobil engelleri dikkate alır.
+
+```mermaid
+flowchart TD
+    A["SaltereGit veya EngeleBekleme her karede"] --> B["AjanBeyni.OnundeMobilEngelVar yon"]
+    B --> C["RaycastSensor.Olc yon"]
+    C --> D["5 isin: -60, -30, 0, +30, +60 derece, menzil 4 m"]
+    D --> E{"Isin trigger olmayan bir collidera carpti mi? Ajanin kendisi atlanir"}
+    E -- Hayir --> F["mesafe 1, tur Yok"]
+    E -- Evet --> G{"Collider turu"}
+    G -- "MobilEngel scripti var" --> H["tur MobilEngel"]
+    G -- "Player etiketi" --> I["tur Oyuncu"]
+    G -- Diger --> J["tur Statik"]
+    H --> K["mesafe = carpma mesafesi / menzil, 0 ile 1 arasi"]
+    I --> K
+    J --> K
+    F --> L["Sadece MobilEngel olcumleri icinden en yakini bulunur, metreye cevrilir"]
+    K --> L
+    L --> M{"En yakin mobil engel beklemeMesafesi 2 m icinde mi?"}
+    M -- Evet --> N["true: EngeleBeklemeDurumu"]
+    M -- Hayir --> O["false: yola devam"]
+```
+
+| Sınıf | Rol |
+|---|---|
+| `ISensor` | `Olc(yon)` ile ölçüm listesi döner, test için sahte (fake) sensör verilebilir |
+| `RaycastSensor` | Fizik tabanlı gerçek sensör, 5 ışın, trigger collider'ları yok sayar |
+| `SensorOlcumu` | Değişmez veri: açı, normalize mesafe, `AlgilananTur` |
+| `AlgilananTur` | `Yok`, `Statik`, `MobilEngel`, `Oyuncu` |
 
 ### 2.3 Parametreler
 

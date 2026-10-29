@@ -100,7 +100,64 @@ Ajan davranışını belirleyen değerler. Inspector'dan değiştirilebilenler `
 
 ### 2.4 Sınıf Diyagramı ve SOLID
 
-_(sınıf diyagramı buraya)_
+```mermaid
+classDiagram
+    class AjanBeyni {
+        -Transform oyuncu
+        -SalterAnahtari salter
+        -float takipMesafesi
+        -float sensorMenzili
+        -float beklemeMesafesi
+        +ISensor Sensor
+        +DurumDegistir(IAjanDurumu)
+        +OnundeMobilEngelVar(Vector2) bool
+    }
+    class IAjanDurumu {
+        <<interface>>
+        +Ad string
+        +Gir()
+        +Guncelle()
+        +Cik()
+        +EmirAlindi()
+    }
+    class OyuncuyuTakipDurumu
+    class SaltereGitDurumu
+    class EngeleBeklemeDurumu
+    class SalteriCekDurumu
+    class BittiDurumu
+    class ISensor {
+        <<interface>>
+        +Olc(Vector2) IReadOnlyList~SensorOlcumu~
+    }
+    class RaycastSensor
+    class SensorOlcumu {
+        +float Aci
+        +float Mesafe
+        +AlgilananTur Tur
+    }
+    class SalterAnahtari
+
+    IAjanDurumu <|.. OyuncuyuTakipDurumu
+    IAjanDurumu <|.. SaltereGitDurumu
+    IAjanDurumu <|.. EngeleBeklemeDurumu
+    IAjanDurumu <|.. SalteriCekDurumu
+    IAjanDurumu <|.. BittiDurumu
+    ISensor <|.. RaycastSensor
+    AjanBeyni --> IAjanDurumu : mevcutDurum
+    AjanBeyni --> ISensor : Sensor
+    AjanBeyni --> SalterAnahtari : salter
+    ISensor ..> SensorOlcumu : uretir
+```
+
+**SOLID uyumu**
+
+| İlke | Kodda nasıl karşılanıyor |
+|---|---|
+| **S** Tek sorumluluk | `RaycastSensor` yalnızca ölçer, `AjanBeyni` durumu yönetir ve karar verir, her durum sınıfı tek bir davranışı taşır |
+| **O** Açık/kapalı | Yeni bir davranış için yeni bir `IAjanDurumu` sınıfı yazılır, `AjanBeyni` değişmez. Ancak geçişler durum sınıflarının içinde `new` ile yapıldığı için mevcut durumların da güncellenmesi gerekir, bu yüzden ilke kısmen karşılanır |
+| **L** Liskov | Tüm durumlar `IAjanDurumu` yerine geçebilir, `AjanBeyni` hangi durumda olduğunu bilmeden `Guncelle()` çağırır |
+| **I** Arayüz ayrımı | `ISensor` tek metotludur, `IAjanDurumu` yalnızca durum yaşam döngüsünü içerir |
+| **D** Bağımlılık tersine çevirme | `AjanBeyni` somut sensöre değil `ISensor`'a bağlıdır, test için sahte sensör verilebilir |
 
 ## 3. LLM Güvenlik NPC
 

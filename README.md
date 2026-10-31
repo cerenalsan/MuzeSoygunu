@@ -179,7 +179,13 @@ _Zeynep dolduracak: sunucu erişilemez, zaman aşımı, model yok, geçersiz JSO
 
 ### 5.1 Ekran görüntüleri
 
-_Ekran görüntüleri buraya._
+**Otonom ajan (NavMesh + sensör):**
+
+| Sensör ışınları | Durum geçişleri |
+|---|---|
+| ![Sensör](docs/ekran-goruntuleri/ajan-sensor.png) | ![Durumlar](docs/ekran-goruntuleri/ajan-durumlar.png) |
+
+Sol: ajanın 5 ışınlı sensörü (yeşil: boş yön, kırmızı: engel). Sağ: Console'da ajanın durum geçişleri (FollowPlayer → MoveToSwitch → PullSwitch → Done) ve şalterin çekilmesi.
 
 ### 5.2 Otonom ajan testleri
 

@@ -76,7 +76,7 @@ namespace MuzeSoygunu.Ceren
             oyuncu.position = oyuncuNoktasi.position;
             ajan.Sifirla(baslangic.position);
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.1f);
             ajan.EmirVer();
 
             float gecen = 0f;

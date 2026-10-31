@@ -7,7 +7,7 @@ namespace MuzeSoygunu.Llm
     public class LlmSettings : ScriptableObject
     {
         [SerializeField] private string baseUrl = "http://127.0.0.1:11434";
-        [SerializeField] private string modelName = "gemma2:2b";
+        [SerializeField] private string modelName = "gemma3:4b";
         [SerializeField, Min(1)] private int timeoutSeconds = 30;
         [SerializeField, Min(1)] private int warmupTimeoutSeconds = 90;
         [SerializeField, Range(0f, 1f)] private float temperature = 0.3f;

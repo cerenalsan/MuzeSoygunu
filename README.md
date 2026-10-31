@@ -177,13 +177,33 @@ _Zeynep dolduracak: sunucu erişilemez, zaman aşımı, model yok, geçersiz JSO
 
 <!-- Sahibi: Ceren (5.2), Zeynep (5.1) -->
 
-## 5.1 Ekran görüntüleri
+### 5.1 Ekran görüntüleri
 
 _Ekran görüntüleri buraya._
 
-## 5.2 Otonom ajan testleri
+### 5.2 Otonom ajan testleri
 
-_(ajan test tablosu buraya: başlangıç noktası, deneme, başarılı, başarı oranı, ortalama süre)_
+Ajanın şalteri çekme görevi, `AjanTestRunner` bileşeniyle otomatik olarak test edildi. Her denemede şalter sıfırlanır, oyuncu sabit bir noktaya alınır, ajan başlangıç noktasına ışınlanır ve Q emri verilir. Şalter 30 saniye içinde çekilirse deneme başarılı sayılır. Ham sonuçlar [`docs/ajan-test/ajan-test-20261031.csv`](docs/ajan-test/ajan-test-20261031.csv) dosyasındadır.
+
+| Koşul | Başlangıç noktası | Deneme | Başarılı | Başarı oranı | Ort. süre (sn) |
+|---|---|---|---|---|---|
+| Engelsiz | Nokta 1 | 10 | 10 | %100 | 5,29 |
+| Engelsiz | Nokta 2 | 10 | 10 | %100 | 6,51 |
+| Engelsiz | Nokta 3 | 10 | 10 | %100 | 5,75 |
+| Engelsiz | Nokta 4 | 10 | 10 | %100 | 4,59 |
+| Hareketli engelli | Nokta 1 | 5 | 5 | %100 | 5,31 |
+| Hareketli engelli | Nokta 2 | 5 | 5 | %100 | 10,95 |
+| Hareketli engelli | Nokta 3 | 5 | 5 | %100 | 5,75 |
+| Hareketli engelli | Nokta 4 | 5 | 5 | %100 | 9,34 |
+
+Toplam 60 denemenin 60'ı başarılı oldu. Ortalama süre yalnızca başarılı denemelerden hesaplanmıştır.
+
+**Yorum:**
+- Engelsiz koşulda süre, başlangıç noktasının şaltere uzaklığıyla artıyor. Ajan yaklaşık 3 m/sn hızla gidiyor.
+- Hareketli engel Nokta 1 ve Nokta 3'ün yolunda değil, bu yüzden süre engelsiz koşulla neredeyse aynı. Nokta 2'de yaklaşık 4,4 sn, Nokta 4'te yaklaşık 4,8 sn gecikme var. Bu gecikme ajanın engeli bekleme durumuna (`WaitForObstacle`) geçmesinden kaynaklanıyor.
+- Aynı noktadaki engelsiz denemelerin süreleri birbirine çok yakın. Oyuncu konumu ve NavMesh sabit olduğu için ajanın davranışı büyük ölçüde belirleyicidir. Bu, %100 başarının sebeplerinden biridir.
+
+**Sınırlamalar:** Test yalnızca dört başlangıç noktasını kapsar. Oyuncu her denemede sabit noktadadır. Başarısızlık senaryoları (örneğin ajanın tamamen sıkışması) bu testte ölçülmemiştir.
 
 ### 5.3 NPC diyalog örnekleri
 

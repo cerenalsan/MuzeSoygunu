@@ -1,4 +1,5 @@
 using System.Collections;
+using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,6 +20,12 @@ namespace MuzeSoygunu.Ceren
         private readonly TestRaporu rapor = new TestRaporu();
         private bool calisiyor;
         private string durumYazisi = "F9: testi baslat";
+        private Vector3 mobilBaslangic;
+
+        private void Awake()
+        {
+            if (mobilEngel != null) mobilBaslangic = mobilEngel.transform.position;
+        }
 
         private void Update()
         {
@@ -34,9 +41,60 @@ namespace MuzeSoygunu.Ceren
         private IEnumerator TestiCalistir()
         {
             calisiyor = true;
-            durumYazisi = "Test henuz bos";
-            yield return null;
+            yield return Kosu("engelsiz", engelsizDenemeSayisi);
+            yield return Kosu("mobil", mobilDenemeSayisi);
+
+            string yol = CsvKaydet();
+            durumYazisi = "Bitti. CSV: " + yol;
+            Debug.Log("[Test] " + durumYazisi);
             calisiyor = false;
         }
+
+        private IEnumerator Kosu(string kosul, int denemeSayisi)
+        {
+            for (int n = 0; n < baslangicNoktalari.Length; n++)
+            {
+                for (int d = 1; d <= denemeSayisi; d++)
+                {
+                    durumYazisi = kosul + " | nokta " + (n + 1) + "/" + baslangicNoktalari.Length
+                                  + " | deneme " + d + "/" + denemeSayisi;
+                    yield return Dene(kosul, n + 1, d, baslangicNoktalari[n]);
+                }
+            }
+        }
+
+        private IEnumerator Dene(string kosul, int noktaNo, int denemeNo, Transform baslangic)
+        {
+            if (mobilEngel != null)
+            {
+                mobilEngel.SetActive(false);
+                mobilEngel.transform.position = mobilBaslangic;
+                mobilEngel.SetActive(kosul == "mobil");
+            }
+
+            salter.Sifirla();
+            oyuncu.position = oyuncuNoktasi.position;
+            ajan.Sifirla(baslangic.position);
+
+            yield return new WaitForSeconds(1f);
+            ajan.EmirVer();
+
+            float gecen = 0f;
+            while (!salter.Cekildi && gecen < zamanAsimiSaniye)
+            {
+                gecen += Time.deltaTime;
+                yield return null;
+            }
+
+            rapor.Ekle(new DenemeSonucu(kosul, noktaNo, denemeNo, salter.Cekildi, gecen));
+        }
+
+        private string CsvKaydet()
+        {
+            string ad = "ajan-test-" + System.DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".csv";
+            string yol = Path.Combine(Application.persistentDataPath, ad);
+            File.WriteAllText(yol, rapor.CsvUret());
+            return yol;
+        }
     }
-}
+    }

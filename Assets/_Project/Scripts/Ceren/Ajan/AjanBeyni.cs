@@ -43,7 +43,7 @@ namespace MuzeSoygunu.Ceren
             if (AsamaIlerletici.OyunBitti(GameStateManager.Instance)) return;
 
             if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
-                mevcutDurum?.EmirAlindi();
+                EmirVer();
 
             mevcutDurum?.Guncelle();
         }
@@ -56,7 +56,17 @@ namespace MuzeSoygunu.Ceren
             Debug.Log("[Ajan] " + eski + " -> " + yeniDurum.Ad);
             mevcutDurum.Gir();
         }
+        public void EmirVer()
+        {
+            mevcutDurum?.EmirAlindi();
+        }
 
+        public void Sifirla(Vector3 konum)
+        {
+            navAjan.ResetPath();
+            navAjan.Warp(konum);
+            DurumDegistir(new OyuncuyuTakipDurumu(this));
+        }
         public bool OnundeMobilEngelVar(Vector2 yon)
         {
             sonYon = yon;

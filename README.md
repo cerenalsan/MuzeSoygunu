@@ -1,1 +1,237 @@
-# MuzeSoygunu
+# MüzeSoygunu
+
+**Ekip:** Ceren Alsan ([@cerenalsan](https://github.com/cerenalsan)), Zeynep Umutlu ([@ZeynepUmutlu](https://github.com/ZeynepUmutlu))
+
+**Ders:** Yazılım Geliştirme Laboratuvarı-I, Proje-1 (Kocaeli Üniversitesi)
+
+**Tarih:** Kasım 2026
+
+**Tür:** Unity (C#), 2D üstten görünüşlü oyun
+
+Müzeye giren bir hırsızı oynarsın. NavMesh üzerinde hareket eden bir yardımcı ajanla şalteri çekip lazerleri kapatır, elması alır ve çıkışta yerel bir LLM ile konuşan güvenlik görevlisini ikna etmeye çalışırsın.
+
+## 1. Giriş
+
+<!-- Sahibi: Ceren + Zeynep -->
+
+_Yazılacak: problemin tanımı, amaç, genel oyun senaryosu (aşamalar), harita görseli, kullanılan teknolojiler (Unity 6.3 LTS, NavMeshPlus, Ollama, gemma3:4b)._
+
+## 2. Otonom AI Kahramanın Karar Mekanizması (NavMesh)
+
+<!-- Sahibi: Ceren -->
+
+### 2.1 Durum Diyagramı
+
+Ajan (`AjanBeyni`) State Pattern ile çalışır. Her durum `IAjanDurumu` arayüzünü gerçekler (`Gir`, `Guncelle`, `Cik`, `EmirAlindi`). Durum geçişleri `DurumDegistir` üzerinden yapılır ve her geçiş konsola `[Ajan] eski -> yeni` olarak yazılır.
+
+```mermaid
+stateDiagram-v2
+    [*] --> FollowPlayer
+    FollowPlayer --> MoveToSwitch : Q emri (salter cekilmemisse)
+    MoveToSwitch --> FollowPlayer : salter icin yol bulunamadi
+    MoveToSwitch --> WaitForObstacle : yonunde mobil engel var
+    MoveToSwitch --> PullSwitch : salter 1 m yakinda
+    WaitForObstacle --> WaitForObstacle : engel 1.2 m den yakin, geri cekil
+    WaitForObstacle --> MoveToSwitch : engel kalkti (en az 0.5 sn bekledikten sonra)
+    PullSwitch --> Done : 1 sn sonra salteri cek
+    Done --> [*]
+```
+
+| Durum | Log adı | Davranış |
+|---|---|---|
+| `OyuncuyuTakipDurumu` | `FollowPlayer` | Oyuncu 2 m'den uzaksa NavMesh ile oyuncuya gider, yakınsa durur |
+| `SaltereGitDurumu` | `MoveToSwitch` | Şaltere yürür, her karede önünü sensörle tarar |
+| `EngeleBeklemeDurumu` | `WaitForObstacle` | Mobil engel varken durur, engel 1.2 m'den yakınsa 1.5 birim geri çekilir |
+| `SalteriCekDurumu` | `PullSwitch` | 1 sn bekler, `Salter.Interact()` çağırır |
+| `BittiDurumu` | `Done` | Görev bitti, hiçbir şey yapmaz |
+
+### 2.2 Sensör Akışı
+
+Algı katmanı `ISensor` arayüzü arkasındadır. `RaycastSensor`, ajanın gidiş yönüne göre yelpaze şeklinde 5 ışın atar ve her ışın için bir `SensorOlcumu` üretir (açı, normalize mesafe, tür). Karar mantığı `AjanBeyni.OnundeMobilEngelVar` içindedir; ajan sadece mobil engelleri dikkate alır.
+
+```mermaid
+flowchart TD
+    A["SaltereGit veya EngeleBekleme her karede"] --> B["AjanBeyni.OnundeMobilEngelVar yon"]
+    B --> C["RaycastSensor.Olc yon"]
+    C --> D["5 isin: -60, -30, 0, +30, +60 derece, menzil 4 m"]
+    D --> E{"Isin trigger olmayan bir collidera carpti mi? Ajanin kendisi atlanir"}
+    E -- Hayir --> F["mesafe 1, tur Yok"]
+    E -- Evet --> G{"Collider turu"}
+    G -- "MobilEngel scripti var" --> H["tur MobilEngel"]
+    G -- "Player etiketi" --> I["tur Oyuncu"]
+    G -- Diger --> J["tur Statik"]
+    H --> K["mesafe = carpma mesafesi / menzil, 0 ile 1 arasi"]
+    I --> K
+    J --> K
+    F --> L["Sadece MobilEngel olcumleri icinden en yakini bulunur, metreye cevrilir"]
+    K --> L
+    L --> M{"En yakin mobil engel beklemeMesafesi 2 m icinde mi?"}
+    M -- Evet --> N["true: EngeleBeklemeDurumu"]
+    M -- Hayir --> O["false: yola devam"]
+```
+
+| Sınıf | Rol |
+|---|---|
+| `ISensor` | `Olc(yon)` ile ölçüm listesi döner, test için sahte (fake) sensör verilebilir |
+| `RaycastSensor` | Fizik tabanlı gerçek sensör, 5 ışın, trigger collider'ları yok sayar |
+| `SensorOlcumu` | Değişmez veri: açı, normalize mesafe, `AlgilananTur` |
+| `AlgilananTur` | `Yok`, `Statik`, `MobilEngel`, `Oyuncu` |
+
+### 2.3 Parametreler
+
+Ajan davranışını belirleyen değerler. Inspector'dan değiştirilebilenler `AjanBeyni` ve `NavMeshAgent` bileşenlerindedir, diğerleri durum sınıflarında sabittir (`const`).
+
+| Parametre | Değer | Birim | Tanımlandığı yer | Anlamı |
+|---|---|---|---|---|
+| `takipMesafesi` | 2 | m | `AjanBeyni` (Inspector) | Oyuncuya bu mesafeden uzaksa ajan takip eder, yakınsa durur |
+| `sensorMenzili` | 4 | m | `AjanBeyni` (Inspector) | Her ışının uzunluğu |
+| `beklemeMesafesi` | 2 | m | `AjanBeyni` (Inspector) | Mobil engel bu mesafeye girerse ajan bekleme durumuna geçer |
+| Işın sayısı ve açıları | 5 ışın: -60, -30, 0, +30, +60 | derece | `RaycastSensor` | Gidiş yönüne göre yelpaze tarama |
+| `EnAzBeklemeSuresi` | 0.5 | sn | `EngeleBeklemeDurumu` | Engel kalksa bile en az bu kadar bekler |
+| `GeriCekilmeMesafesi` | 1.2 | m | `EngeleBeklemeDurumu` | Engel bundan yakınsa ajan geri çekilir |
+| `GeriCekilmeAdimi` | 1.5 | m | `EngeleBeklemeDurumu` | Geri çekilirken gidilecek mesafe |
+| `YaklasmaMesafesi` | 1 | m | `SaltereGitDurumu` | Şaltere bu kadar yaklaşınca şalteri çekmeye başlar |
+| `CekmeSuresi` | 1 | sn | `SalteriCekDurumu` | Şalteri çekmeden önce bekleme süresi |
+| Emir tuşu | Q | - | `AjanBeyni` | Ajana "şalteri çek" emrini verir |
+| `Speed` | 3.5 | m/sn | `NavMeshAgent` | Hareket hızı (oyuncu 5 m/sn) |
+| `Angular Speed` | 120 | derece/sn | `NavMeshAgent` | Dönüş hızı |
+| `Acceleration` | 14 | m/sn² | `NavMeshAgent` | İvme |
+| `Stopping Distance` | 0 | m | `NavMeshAgent` | Hedefe varış toleransı |
+| `Radius` / `Height` | 0.5 / 1 | m | `NavMeshAgent` | Ajan boyutu, NavMesh sınırlarını belirler |
+| `Auto Braking` | Açık | - | `NavMeshAgent` | Hedefe yaklaşırken yavaşlar |
+
+### 2.4 Sınıf Diyagramı ve SOLID
+
+```mermaid
+classDiagram
+    class AjanBeyni {
+        -Transform oyuncu
+        -SalterAnahtari salter
+        -float takipMesafesi
+        -float sensorMenzili
+        -float beklemeMesafesi
+        +ISensor Sensor
+        +DurumDegistir(IAjanDurumu)
+        +OnundeMobilEngelVar(Vector2) bool
+    }
+    class IAjanDurumu {
+        <<interface>>
+        +Ad string
+        +Gir()
+        +Guncelle()
+        +Cik()
+        +EmirAlindi()
+    }
+    class OyuncuyuTakipDurumu
+    class SaltereGitDurumu
+    class EngeleBeklemeDurumu
+    class SalteriCekDurumu
+    class BittiDurumu
+    class ISensor {
+        <<interface>>
+        +Olc(Vector2) IReadOnlyList~SensorOlcumu~
+    }
+    class RaycastSensor
+    class SensorOlcumu {
+        +float Aci
+        +float Mesafe
+        +AlgilananTur Tur
+    }
+    class SalterAnahtari
+
+    IAjanDurumu <|.. OyuncuyuTakipDurumu
+    IAjanDurumu <|.. SaltereGitDurumu
+    IAjanDurumu <|.. EngeleBeklemeDurumu
+    IAjanDurumu <|.. SalteriCekDurumu
+    IAjanDurumu <|.. BittiDurumu
+    ISensor <|.. RaycastSensor
+    AjanBeyni --> IAjanDurumu : mevcutDurum
+    AjanBeyni --> ISensor : Sensor
+    AjanBeyni --> SalterAnahtari : salter
+    ISensor ..> SensorOlcumu : uretir
+```
+
+**SOLID uyumu**
+
+| İlke | Kodda nasıl karşılanıyor |
+|---|---|
+| **S** Tek sorumluluk | `RaycastSensor` yalnızca ölçer, `AjanBeyni` durumu yönetir ve karar verir, her durum sınıfı tek bir davranışı taşır |
+| **O** Açık/kapalı | Yeni bir davranış için yeni bir `IAjanDurumu` sınıfı yazılır, `AjanBeyni` değişmez. Ancak geçişler durum sınıflarının içinde `new` ile yapıldığı için mevcut durumların da güncellenmesi gerekir, bu yüzden ilke kısmen karşılanır |
+| **L** Liskov | Tüm durumlar `IAjanDurumu` yerine geçebilir, `AjanBeyni` hangi durumda olduğunu bilmeden `Guncelle()` çağırır |
+| **I** Arayüz ayrımı | `ISensor` tek metotludur, `IAjanDurumu` yalnızca durum yaşam döngüsünü içerir |
+| **D** Bağımlılık tersine çevirme | `AjanBeyni` somut sensöre değil `ISensor`'a bağlıdır, test için sahte sensör verilebilir |
+
+## 3. LLM Entegrasyonunun Mimarisi
+
+<!-- Sahibi: Zeynep -->
+
+_Zeynep dolduracak: model seçimi, prompt, JSON sözleşmesi, hata yönetimi._
+
+## 4. Hata Yönetimi Stratejisi
+
+<!-- Sahibi: Ceren + Zeynep -->
+
+_Zeynep dolduracak: sunucu erişilemez, zaman aşımı, model yok, geçersiz JSON; hata akış şeması; asenkron yapı._
+
+## 5. Ekran Görüntüleri, Test Senaryoları ve Sonuçlar
+
+<!-- Sahibi: Ceren (5.2), Zeynep (5.1) -->
+
+### 5.1 Ekran görüntüleri
+
+**Otonom ajan (NavMesh + sensör):**
+
+| Sensör ışınları | Durum geçişleri |
+|---|---|
+| ![Sensör](docs/ekran-goruntuleri/ajan-sensor.png) | ![Durumlar](docs/ekran-goruntuleri/ajan-durumlar.png) |
+
+Sol: ajanın 5 ışınlı sensörü (yeşil: boş yön, kırmızı: engel). Sağ: Console'da ajanın durum geçişleri (FollowPlayer → MoveToSwitch → PullSwitch → Done) ve şalterin çekilmesi.
+
+### 5.2 Otonom ajan testleri
+
+Ajanın şalteri çekme görevi, `AjanTestRunner` bileşeniyle otomatik olarak test edildi. Her denemede şalter sıfırlanır, oyuncu sabit bir noktaya alınır, ajan başlangıç noktasına ışınlanır ve Q emri verilir. Şalter 30 saniye içinde çekilirse deneme başarılı sayılır. Ham sonuçlar [`docs/ajan-test/ajan-test-20261031.csv`](docs/ajan-test/ajan-test-20261031.csv) dosyasındadır.
+
+| Koşul | Başlangıç noktası | Deneme | Başarılı | Başarı oranı | Ort. süre (sn) |
+|---|---|---|---|---|---|
+| Engelsiz | Nokta 1 | 10 | 10 | %100 | 5,29 |
+| Engelsiz | Nokta 2 | 10 | 10 | %100 | 6,51 |
+| Engelsiz | Nokta 3 | 10 | 10 | %100 | 5,75 |
+| Engelsiz | Nokta 4 | 10 | 10 | %100 | 4,59 |
+| Hareketli engelli | Nokta 1 | 5 | 5 | %100 | 5,31 |
+| Hareketli engelli | Nokta 2 | 5 | 5 | %100 | 10,95 |
+| Hareketli engelli | Nokta 3 | 5 | 5 | %100 | 5,75 |
+| Hareketli engelli | Nokta 4 | 5 | 5 | %100 | 9,34 |
+
+Toplam 60 denemenin 60'ı başarılı oldu. Ortalama süre yalnızca başarılı denemelerden hesaplanmıştır.
+
+**Yorum:**
+- Engelsiz koşulda süre, başlangıç noktasının şaltere uzaklığıyla artıyor. Ajan yaklaşık 3 m/sn hızla gidiyor.
+- Hareketli engel Nokta 1 ve Nokta 3'ün yolunda değil, bu yüzden süre engelsiz koşulla neredeyse aynı. Nokta 2'de yaklaşık 4,4 sn, Nokta 4'te yaklaşık 4,8 sn gecikme var. Bu gecikme ajanın engeli bekleme durumuna (`WaitForObstacle`) geçmesinden kaynaklanıyor.
+- Aynı noktadaki engelsiz denemelerin süreleri birbirine çok yakın. Oyuncu konumu ve NavMesh sabit olduğu için ajanın davranışı büyük ölçüde belirleyicidir. Bu, %100 başarının sebeplerinden biridir.
+
+**Sınırlamalar:** Test yalnızca dört başlangıç noktasını kapsar. Oyuncu her denemede sabit noktadadır. Başarısızlık senaryoları (örneğin ajanın tamamen sıkışması) bu testte ölçülmemiştir.
+
+### 5.3 NPC diyalog örnekleri
+
+_Zeynep dolduracak._
+
+### 5.4 Hata senaryosu testleri
+
+_Zeynep dolduracak._
+
+## 6. Sonuç ve Tartışma
+
+<!-- Sahibi: Ceren + Zeynep -->
+
+_Başarılar · Sınırlılıklar · Olası geliştirmeler._
+
+Riskler: [docs/risk-notlari.md](docs/risk-notlari.md) · Kararlar: [docs/kararlar.md](docs/kararlar.md)
+
+## Kurulum ve Çalıştırma
+
+_Unity sürümü, Ollama kurulumu ve model (`ollama pull gemma3:4b`), build'in çalıştırılması._
+
+## Kaynaklar ve Asset Lisansları
+
+Bkz. [ASSETS.md](ASSETS.md)
+

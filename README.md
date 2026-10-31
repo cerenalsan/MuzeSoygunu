@@ -1,20 +1,22 @@
 # MüzeSoygunu
 
-Kocaeli Üniversitesi BSM · Yazılım Geliştirme Laboratuvarı-I · Proje-1
+**Ekip:** Ceren Alsan ([@cerenalsan](https://github.com/cerenalsan)), Zeynep Umutlu ([@ZeynepUmutlu](https://github.com/ZeynepUmutlu))
 
-Unity 6.3 LTS (6000.3.25f1) · 2D Built-in RP · yeni Input System
+**Ders:** Yazılım Geliştirme Laboratuvarı-I, Proje-1 (Kocaeli Üniversitesi)
 
-**Ekip:** Ceren Alsan ([@cerenalsan](https://github.com/cerenalsan)) · Zeynep Umutlu ([@ZeynepUmutlu](https://github.com/ZeynepUmutlu))
+**Tarih:** Kasım 2026
+
+**Tür:** Unity (C#), 2D üstten görünüşlü oyun
 
 Müzeye giren bir hırsızı oynarsın. NavMesh üzerinde hareket eden bir yardımcı ajanla şalteri çekip lazerleri kapatır, elması alır ve çıkışta yerel bir LLM ile konuşan güvenlik görevlisini ikna etmeye çalışırsın.
 
-## 1. Proje Özeti ve Kurulum
+## 1. Giriş
 
 <!-- Sahibi: Ceren + Zeynep -->
 
-_Yazılacak: oyunun akışı, gerekli yazılımlar (Unity sürümü, Ollama), çalıştırma adımları._
+_Yazılacak: problemin tanımı, amaç, genel oyun senaryosu (aşamalar), harita görseli, kullanılan teknolojiler (Unity 6.3 LTS, NavMeshPlus, Ollama, gemma3:4b)._
 
-## 2. Ajan Mimarisi
+## 2. Otonom AI Kahramanın Karar Mekanizması (NavMesh)
 
 <!-- Sahibi: Ceren -->
 
@@ -43,7 +45,7 @@ stateDiagram-v2
 | `SalteriCekDurumu` | `PullSwitch` | 1 sn bekler, `Salter.Interact()` çağırır |
 | `BittiDurumu` | `Done` | Görev bitti, hiçbir şey yapmaz |
 
-### 2.2 Sensör ve Algı
+### 2.2 Sensör Akışı
 
 Algı katmanı `ISensor` arayüzü arkasındadır. `RaycastSensor`, ajanın gidiş yönüne göre yelpaze şeklinde 5 ışın atar ve her ışın için bir `SensorOlcumu` üretir (açı, normalize mesafe, tür). Karar mantığı `AjanBeyni.OnundeMobilEngelVar` içindedir; ajan sadece mobil engelleri dikkate alır.
 
@@ -159,35 +161,51 @@ classDiagram
 | **I** Arayüz ayrımı | `ISensor` tek metotludur, `IAjanDurumu` yalnızca durum yaşam döngüsünü içerir |
 | **D** Bağımlılık tersine çevirme | `AjanBeyni` somut sensöre değil `ISensor`'a bağlıdır, test için sahte sensör verilebilir |
 
-## 3. LLM Güvenlik NPC
+## 3. LLM Entegrasyonunun Mimarisi
 
 <!-- Sahibi: Zeynep -->
 
 _Zeynep dolduracak: model seçimi, prompt, JSON sözleşmesi, hata yönetimi._
 
-## 4. Oyun Akışı ve Sahneler
+## 4. Hata Yönetimi Stratejisi
 
 <!-- Sahibi: Ceren + Zeynep -->
 
-_Yazılacak: aşamalar (GameStage), sahne geçişleri, ortak sözleşme (Scripts/Shared)._
+_Zeynep dolduracak: sunucu erişilemez, zaman aşımı, model yok, geçersiz JSON; hata akış şeması; asenkron yapı._
 
-## 5. Testler
+## 5. Ekran Görüntüleri, Test Senaryoları ve Sonuçlar
 
 <!-- Sahibi: Ceren (5.2), Zeynep (5.1) -->
 
-### 5.1 NPC Testleri
+## 5.1 Ekran görüntüleri
+
+_Ekran görüntüleri buraya._
+
+## 5.2 Otonom ajan testleri
+
+_(ajan test tablosu buraya: başlangıç noktası, deneme, başarılı, başarı oranı, ortalama süre)_
+
+### 5.3 NPC diyalog örnekleri
 
 _Zeynep dolduracak._
 
-### 5.2 Ajan Testleri
+### 5.4 Hata senaryosu testleri
 
-_(birim testleri buraya)_
+_Zeynep dolduracak._
 
-## 6. Riskler ve Ekip Çalışması
+## 6. Sonuç ve Tartışma
 
 <!-- Sahibi: Ceren + Zeynep -->
 
+_Başarılar · Sınırlılıklar · Olası geliştirmeler._
+
 Riskler: [docs/risk-notlari.md](docs/risk-notlari.md) · Kararlar: [docs/kararlar.md](docs/kararlar.md)
 
-_Yazılacak: commit/PR akışı, kullanılan görseller ([ASSETS.md](ASSETS.md))._
+## Kurulum ve Çalıştırma
+
+_Unity sürümü, Ollama kurulumu ve model (`ollama pull gemma3:4b`), build'in çalıştırılması._
+
+## Kaynaklar ve Asset Lisansları
+
+Bkz. [ASSETS.md](ASSETS.md)
 

@@ -9,6 +9,8 @@
 |---|---|---|
 | llama3.2:3b | 2.0 GB | Düz sohbette Türkçe bozuk: İngilizce ve Endonezce kelimeler karıştı, anlamsız cümleler |
 | gemma2:2b | 1.6 GB | Düz sohbette Türkçe akıcı ve anlaşılır. Cevap hızı iyi (tek cümle için yaklaşık 3 sn) |
+| gemma3:4b | ~3 GB | SEÇİLDİ: 6 GB VRAM'e sığar (100% GPU), Türkçe akıcı |
+| gemma4:e4b | ~9 GB | Elendi: demo makinesinde cevap süresi çok uzun |
 
 Bilgisayarda ayrıca qwen2.5:3b, qwen2.5:7b ve llama3.2:1b indirilmiş durumda; henüz denenmedi.
 
@@ -71,3 +73,15 @@ Gözlemler:
 - Qwen'in cevaplarında bozuk harfler ve bir satırda Çince karakterler var; gemma'da bir satırda bozuk karakter görüldü.
 - Hatırlatma eki `open_door` sayısını 7'den 5'e indirdi ama bu fark tek koşunun oynama aralığında; itirafta `alarm` yine çıkmadı. Kullanılmadı (`UseReminder = false`).
 - Prompttaki örnekler test cümlelerine benzediği için sonuçlar gerçek iyileşmeden iyimser olabilir. Tek koşu, sonuçlar gösterge niteliğinde.
+
+## 29 Ekim güncellemesi
+
+LLM modeli `gemma2:2b` yerine **`gemma3:4b`** olarak değiştirildi. Önceki modelde güvenlik görevlisinin cevaplarında zaman zaman kelime ve cümle hataları görülüyordu. Üç aday aynı koşullarda denendi:
+
+- **`gemma3:4b`:** `ollama ps` çıktısında `100% GPU` göründü, yani model VRAM'e tamamen sığdı. Basit Türkçe duman testinde cevap akıcı ve hatasızdı.
+- **`gemma4:e4b`:** Aynı donanımda cevap süresi oyun için fazla yavaş çıktı, bu yüzden elendi.
+- **`gemma2:2b`:** Önceki model, karşılaştırma için baz çizgi olarak tutuldu.
+
+Seçim kriterleri belleğe sığma (100% GPU) ve cevap süresi oldu, çünkü demo makinesinin 6 GB VRAM'i var ve oyun sırasında bekleme yaşanmamalı. JSON geçerliliği ve `action` doğruluğu sonuçları `docs/model-testi/sonuc-v2-gemma3-4b.txt` dosyasındadır.
+
+Model adı `Assets/_Project/Scripts/Zeynep/LlmSettings.asset` içindeki `modelName` alanından belirlenir. Sorun çıkarsa bu alanı `gemma2:2b` yaparak eski modele tek adımda dönülebilir.

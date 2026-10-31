@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LlmSettings
   m_EditorClassIdentifier: Assembly-CSharp::MuzeSoygunu.Llm.LlmSettings
   baseUrl: http://127.0.0.1:11434
-  modelName: gemma2:2b
+  modelName: gemma3:4b
   timeoutSeconds: 30
   warmupTimeoutSeconds: 90
   temperature: 0.3

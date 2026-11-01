@@ -61,3 +61,21 @@
 
 - **Sonuçlar**
 JSON geçerliliği, `action` doğruluğu ve süre ölçümleri `docs/model-testi/sonuc-v2-gemma3-4b.txt` dosyasındadır.
+
+## 1 Kasım 2026
+
+- **Bağlam**
+
+Build testinde güvenlik görevlisi karar vermeyip sürekli soru soruyordu. "Annem hastanede" gibi makul sebeplerde bile reddediyordu ve prompt'taki ilk örnek cümleyi aynen kopyalıyordu. Oyun kazanılabilir olmalıydı.
+
+- **Denenen adaylar**
+  - `v1`: `open_door` için "kim olduğunu, ne yaptığını, kim gönderdiğini" şartı koşuyordu. Soru sormanın sınırı yoktu.
+  - `v2`: kuralları genişletildi, soru sayısı sınırlandı, örnekler çeşitlendirildi.
+
+- **Karar**
+
+Prompt `v2` kullanılacak. `open_door` için aile acili, kaza, hastalık, iş görevi gibi makul sebepler yeterli. Konuşma boyunca en fazla bir soru sorulur, aynı soru tekrarlanmaz. Sıkılma gibi zayıf sebepler reddedilir, tehdit ve itiraf alarm verir. JSON şeması (`say`, `action`) değişmedi. Geri dönüş: `GuardPromptBuilder.cs` içinde `Version` ve metin `v1`'e alınır.
+
+- **Sonuçlar**
+
+Metin `docs/model-testi/prompt-v2.txt` dosyasındadır. Kazanma ve reddetme senaryolarının sonuçları test sonrası eklenecek.

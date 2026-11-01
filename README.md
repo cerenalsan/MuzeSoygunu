@@ -229,8 +229,27 @@ Riskler: [docs/risk-notlari.md](docs/risk-notlari.md) · Kararlar: [docs/kararla
 
 ## Kurulum ve Çalıştırma
 
-_Unity sürümü, Ollama kurulumu ve model (`ollama pull gemma3:4b`), build'in çalıştırılması._
+**Gereksinimler**
+- Windows 10/11
+- Unity 6.3 LTS (6000.3.25f1), yalnızca projeyi Unity'de açmak için. Build'i çalıştırmak için gerekmez.
+- Ollama (https://ollama.com), yerel dil modeli sunucusu
 
+**Model kurulumu**
+ollama pull gemma3:4b
+
+Model yaklaşık 3,4 GB'dır. Önerilen donanım: en az 6 GB VRAM'li ekran kartı (model GPU'da çalışır). Ollama kapalıyken oyun çökmez, ekranda hata mesajı gösterir ve Ollama açıldıktan sonra "Tekrar dene" düğmesiyle devam edilir.
+
+**Build'i çalıştırma**
+1. Ollama'nın çalıştığından emin olun (sistem tepsisinde lama simgesi).
+2. Build klasöründeki `.exe` dosyasını çalıştırın.
+3. Menüden "Başla"ya basın.
+
+**Projeyi Unity'de açma**
+1. Depoyu klonlayın: `git clone https://github.com/cerenalsan/MuzeSoygunu.git`
+2. Unity Hub'da klasörü açın (Unity 6000.3.25f1).
+3. `Assets/_Project/Scenes/00_Menu` sahnesini açıp Play'e basın.
+
+**Kontroller:** Yön tuşları / WASD hareket, Space zıplama, E etkileşim, Q ajana emir (02_Lazer).
 ## Kaynaklar ve Asset Lisansları
 
 Bkz. [ASSETS.md](ASSETS.md)

@@ -415,27 +415,27 @@ Oyuncu elması aldığını söylediğinde güvenlik görevlisi durumu hırsızl
 
 ### 5.2 Otonom ajan testleri
 
-Ajanın şalteri çekme görevi, `AjanTestRunner` bileşeniyle otomatik olarak test edildi. Her denemede şalter sıfırlanır, oyuncu sabit bir noktaya alınır, ajan başlangıç noktasına ışınlanır ve Q emri verilir. Şalter 30 saniye içinde çekilirse deneme başarılı sayılır. Ham sonuçlar [`docs/ajan-test/ajan-test-20261031.csv`](docs/ajan-test/ajan-test-20261031.csv) dosyasındadır.
+Ajanın şalteri çekme görevi, `AjanTestRunner` bileşeniyle otomatik olarak test edildi. Her denemede şalter sıfırlanır, oyuncu sabit noktaya ışınlanır, ajan başlangıç noktasına ışınlanır ve Q emri verilir. Şalter 30 saniye içinde çekilirse deneme başarılı sayılır. Test iki ayrı bilgisayarda (Ceren ve Zeynep) aynı sahne ve aynı ayarlarla çalıştırıldı. Ham sonuçlar [`ajan-test-20261031.csv`](docs/ajan-test/ajan-test-20261031.csv) (Ceren) ve [`ajan-test-zeynep-20261102.csv`](docs/ajan-test/ajan-test-zeynep-20261102.csv) (Zeynep) dosyalarındadır. İki dosya, bilgisayar sütunu eklenmiş hâliyle [`ajan-test-birlesik.csv`](docs/ajan-test/ajan-test-birlesik.csv) içinde birleştirilmiştir.
 
-| Koşul | Başlangıç noktası | Deneme | Başarılı | Başarı oranı | Ort. süre (sn) |
-|---|---|---|---|---|---|
-| Engelsiz | Nokta 1 | 10 | 10 | %100 | 5,29 |
-| Engelsiz | Nokta 2 | 10 | 10 | %100 | 6,51 |
-| Engelsiz | Nokta 3 | 10 | 10 | %100 | 5,75 |
-| Engelsiz | Nokta 4 | 10 | 10 | %100 | 4,59 |
-| Hareketli engelli | Nokta 1 | 5 | 5 | %100 | 5,31 |
-| Hareketli engelli | Nokta 2 | 5 | 5 | %100 | 10,95 |
-| Hareketli engelli | Nokta 3 | 5 | 5 | %100 | 5,75 |
-| Hareketli engelli | Nokta 4 | 5 | 5 | %100 | 9,34 |
+| Koşul | Başlangıç noktası | Deneme (her bilgisayarda) | Başarılı (Ceren / Zeynep) | Başarı oranı | Ort. süre sn (Ceren) | Ort. süre sn (Zeynep) |
+|---|---|---|---|---|---|---|
+| Engelsiz | Nokta 1 | 10 | 10 / 10 | %100 | 5,29 | 5,29 |
+| Engelsiz | Nokta 2 | 10 | 10 / 10 | %100 | 6,51 | 6,50 |
+| Engelsiz | Nokta 3 | 10 | 10 / 10 | %100 | 5,75 | 5,75 |
+| Engelsiz | Nokta 4 | 10 | 10 / 10 | %100 | 4,59 | 4,58 |
+| Hareketli engelli | Nokta 1 | 5 | 5 / 5 | %100 | 5,31 | 5,31 |
+| Hareketli engelli | Nokta 2 | 5 | 5 / 5 | %100 | 10,95 | 11,70 |
+| Hareketli engelli | Nokta 3 | 5 | 5 / 5 | %100 | 5,75 | 5,75 |
+| Hareketli engelli | Nokta 4 | 5 | 5 / 5 | %100 | 9,34 | 9,34 |
 
-Toplam 60 denemenin 60'ı başarılı oldu. Ortalama süre yalnızca başarılı denemelerden hesaplanmıştır.
+Her bilgisayarda 60 denemenin 60'ı, toplamda 120 denemenin 120'si başarılı oldu. Ortalama süre yalnızca başarılı denemelerden hesaplanmıştır.
 
 **Yorum:**
 - Engelsiz koşulda süre, başlangıç noktasının şaltere uzaklığıyla artıyor. Ajan yaklaşık 3 m/sn hızla gidiyor.
-- Hareketli engel Nokta 1 ve Nokta 3'ün yolunda değil, bu yüzden süre engelsiz koşulla neredeyse aynı. Nokta 2'de yaklaşık 4,4 sn, Nokta 4'te yaklaşık 4,8 sn gecikme var. Bu gecikme ajanın engeli bekleme durumuna (`WaitForObstacle`) geçmesinden kaynaklanıyor.
-- Aynı noktadaki engelsiz denemelerin süreleri birbirine çok yakın. Oyuncu konumu ve NavMesh sabit olduğu için ajanın davranışı büyük ölçüde belirleyicidir. Bu, %100 başarının sebeplerinden biridir.
+- Hareketli engel Nokta 1 ve Nokta 3'ün yolunda değil, bu yüzden süre engelsiz koşulla neredeyse aynı. Nokta 2'de yaklaşık 4,4 (Ceren) ve 5,2 (Zeynep) sn, Nokta 4'te yaklaşık 4,8 sn gecikme var. Bu gecikme ajanın engeli bekleme durumuna (`WaitForObstacle`) geçmesinden kaynaklanıyor.
+- İki bilgisayarın sonuçları birbirine çok yakın. Aynı noktadaki engelsiz denemelerin süreleri de birbirine yakın. Oyuncu konumu ve NavMesh sabit olduğu için ajanın davranışı büyük ölçüde belirleyicidir. Bu, %100 başarının sebeplerinden biridir. Tek fark, hareketli engelli Nokta 2'de görülen yaklaşık 0,75 sn'lik süre farkıdır. Engelin o anki konumuna bağlı olduğunu düşünüyoruz.
 
-**Sınırlamalar:** Test yalnızca dört başlangıç noktasını kapsar. Oyuncu her denemede sabit noktadadır. Başarısızlık senaryoları (örneğin ajanın tamamen sıkışması) bu testte ölçülmemiştir.
+**Sınırlamalar:** Test yalnızca dört başlangıç noktasını kapsar. Oyuncu her denemede sabit noktadadır. Başarısızlık senaryoları (ör. ajanın köşede sıkışması) bu testte ölçülmemiştir. İki bilgisayar da aynı sahneyi çalıştırdığı için ikinci bilgisayar bağımsız bir senaryo değil, sonuçların yeniden üretilebilirliğinin kanıtıdır.
 
 ### 5.3 NPC diyalog örnekleri
 
@@ -509,50 +509,27 @@ LLM tabanlı NPC ise oyuncunun yazdığı mesajları değerlendirerek farklı oy
 
 ## Kurulum ve Çalıştırma
 
-### Gereksinimler
+**Gereksinimler**
+- Windows 10/11
+- Unity 6.3 LTS (6000.3.25f1), yalnızca projeyi Unity'de açmak için. Build'i çalıştırmak için gerekmez.
+- Ollama (https://ollama.com), yerel dil modeli sunucusu
 
-- Unity 6.3
-- Ollama
-- `gemma3:4b` modeli
-
-### 1. Projeyi İndirme
-
-GitHub üzerinden proje bilgisayara klonlanır:
-
-```bash
-git clone https://github.com/cerenalsan/MuzeSoygunu.git
-```
-
-### 2. Unity ile Projeyi Açma
-
-1. Unity Hub açılır.
-2. Add seçeneği kullanılarak indirilen proje klasörü seçilir.
-3. Proje Unity 6.3 sürümüyle açılır.
-4. Gerekli paketlerin yüklenmesi beklenir.
-
-### 3. Ollama Kurulumu ve Modelin İndirilmesi
-
-Ollama bilgisayara kurulur. Ardından terminal açılarak aşağıdaki komut çalıştırılır:
-
-```bash
+**Model kurulumu**
 ollama pull gemma3:4b
-```
 
-Modelin indirildiğinden emin olmak için şu komut kullanılabilir:
+Model yaklaşık 3,4 GB'dır. Önerilen donanım: en az 6 GB VRAM'li ekran kartı (model GPU'da çalışır). Ollama kapalıyken oyun çökmez, ekranda hata mesajı gösterir ve Ollama açıldıktan sonra "Tekrar dene" düğmesiyle devam edilir.
 
-```bash
-ollama list
-```
+**Build'i çalıştırma**
+1. Ollama'nın çalıştığından emin olun (sistem tepsisinde lama simgesi).
+2. Build klasöründeki `.exe` dosyasını çalıştırın.
+3. Menüden "Başla"ya basın.
 
-### 4. Oyunun Çalıştırılması
+**Projeyi Unity'de açma**
+1. Depoyu klonlayın: `git clone https://github.com/cerenalsan/MuzeSoygunu.git`
+2. Unity Hub'da klasörü açın (Unity 6000.3.25f1).
+3. `Assets/_Project/Scenes/00_Menu` sahnesini açıp Play'e basın.
 
-1. Ollama servisinin çalıştığından emin olunur.
-2. Unity üzerinden `Assets/_Project/Scenes/00_Menu.unity` sahnesi açılır.
-3. Play butonuna basılarak oyun başlatılır.
-4. Oyuncu, güvenlik görevlisi NPC ile etkileşime girerek diyalog başlatabilir.
-5. NPC, oyuncunun mesajına göre ilgili oyun eylemini gerçekleştirir.
-
-
+**Kontroller:** Yön tuşları / WASD hareket, Space zıplama, E etkileşim, Q ajana emir (02_Lazer).
 ## Kaynaklar ve Asset Lisansları
 
 Bkz. [ASSETS.md](ASSETS.md)

@@ -189,27 +189,29 @@ Sol: ajanın 5 ışınlı sensörü (yeşil: boş yön, kırmızı: engel). Sağ
 
 ### 5.2 Otonom ajan testleri
 
-Ajanın şalteri çekme görevi, `AjanTestRunner` bileşeniyle otomatik olarak test edildi. Her denemede şalter sıfırlanır, oyuncu sabit bir noktaya alınır, ajan başlangıç noktasına ışınlanır ve Q emri verilir. Şalter 30 saniye içinde çekilirse deneme başarılı sayılır. Ham sonuçlar [`docs/ajan-test/ajan-test-20261031.csv`](docs/ajan-test/ajan-test-20261031.csv) dosyasındadır.
+### 5.2 Otonom ajan testleri
 
-| Koşul | Başlangıç noktası | Deneme | Başarılı | Başarı oranı | Ort. süre (sn) |
-|---|---|---|---|---|---|
-| Engelsiz | Nokta 1 | 10 | 10 | %100 | 5,29 |
-| Engelsiz | Nokta 2 | 10 | 10 | %100 | 6,51 |
-| Engelsiz | Nokta 3 | 10 | 10 | %100 | 5,75 |
-| Engelsiz | Nokta 4 | 10 | 10 | %100 | 4,59 |
-| Hareketli engelli | Nokta 1 | 5 | 5 | %100 | 5,31 |
-| Hareketli engelli | Nokta 2 | 5 | 5 | %100 | 10,95 |
-| Hareketli engelli | Nokta 3 | 5 | 5 | %100 | 5,75 |
-| Hareketli engelli | Nokta 4 | 5 | 5 | %100 | 9,34 |
+Ajanın şalteri çekme görevi, `AjanTestRunner` bileşeniyle otomatik olarak test edildi. Her denemede şalter sıfırlanır, oyuncu sabit noktaya ışınlanır, ajan başlangıç noktasına ışınlanır ve Q emri verilir. Şalter 30 saniye içinde çekilirse deneme başarılı sayılır. Test iki ayrı bilgisayarda (Ceren ve Zeynep) aynı sahne ve aynı ayarlarla çalıştırıldı. Ham sonuçlar [`ajan-test-20261031.csv`](docs/ajan-test/ajan-test-20261031.csv) (Ceren) ve [`ajan-test-zeynep-20261102.csv`](docs/ajan-test/ajan-test-zeynep-20261102.csv) (Zeynep) dosyalarındadır. İki dosya, bilgisayar sütunu eklenmiş hâliyle [`ajan-test-birlesik.csv`](docs/ajan-test/ajan-test-birlesik.csv) içinde birleştirilmiştir.
 
-Toplam 60 denemenin 60'ı başarılı oldu. Ortalama süre yalnızca başarılı denemelerden hesaplanmıştır.
+| Koşul | Başlangıç noktası | Deneme (her bilgisayarda) | Başarılı (Ceren / Zeynep) | Başarı oranı | Ort. süre sn (Ceren) | Ort. süre sn (Zeynep) |
+|---|---|---|---|---|---|---|
+| Engelsiz | Nokta 1 | 10 | 10 / 10 | %100 | 5,29 | 5,29 |
+| Engelsiz | Nokta 2 | 10 | 10 / 10 | %100 | 6,51 | 6,50 |
+| Engelsiz | Nokta 3 | 10 | 10 / 10 | %100 | 5,75 | 5,75 |
+| Engelsiz | Nokta 4 | 10 | 10 / 10 | %100 | 4,59 | 4,58 |
+| Hareketli engelli | Nokta 1 | 5 | 5 / 5 | %100 | 5,31 | 5,31 |
+| Hareketli engelli | Nokta 2 | 5 | 5 / 5 | %100 | 10,95 | 11,70 |
+| Hareketli engelli | Nokta 3 | 5 | 5 / 5 | %100 | 5,75 | 5,75 |
+| Hareketli engelli | Nokta 4 | 5 | 5 / 5 | %100 | 9,34 | 9,34 |
+
+Her bilgisayarda 60 denemenin 60'ı, toplamda 120 denemenin 120'si başarılı oldu. Ortalama süre yalnızca başarılı denemelerden hesaplanmıştır.
 
 **Yorum:**
 - Engelsiz koşulda süre, başlangıç noktasının şaltere uzaklığıyla artıyor. Ajan yaklaşık 3 m/sn hızla gidiyor.
-- Hareketli engel Nokta 1 ve Nokta 3'ün yolunda değil, bu yüzden süre engelsiz koşulla neredeyse aynı. Nokta 2'de yaklaşık 4,4 sn, Nokta 4'te yaklaşık 4,8 sn gecikme var. Bu gecikme ajanın engeli bekleme durumuna (`WaitForObstacle`) geçmesinden kaynaklanıyor.
-- Aynı noktadaki engelsiz denemelerin süreleri birbirine çok yakın. Oyuncu konumu ve NavMesh sabit olduğu için ajanın davranışı büyük ölçüde belirleyicidir. Bu, %100 başarının sebeplerinden biridir.
+- Hareketli engel Nokta 1 ve Nokta 3'ün yolunda değil, bu yüzden süre engelsiz koşulla neredeyse aynı. Nokta 2'de yaklaşık 4,4 (Ceren) ve 5,2 (Zeynep) sn, Nokta 4'te yaklaşık 4,8 sn gecikme var. Bu gecikme ajanın engeli bekleme durumuna (`WaitForObstacle`) geçmesinden kaynaklanıyor.
+- İki bilgisayarın sonuçları birbirine çok yakın. Aynı noktadaki engelsiz denemelerin süreleri de birbirine yakın. Oyuncu konumu ve NavMesh sabit olduğu için ajanın davranışı büyük ölçüde belirleyicidir. Bu, %100 başarının sebeplerinden biridir. Tek fark, hareketli engelli Nokta 2'de görülen yaklaşık 0,75 sn'lik süre farkıdır. Engelin o anki konumuna bağlı olduğunu düşünüyoruz.
 
-**Sınırlamalar:** Test yalnızca dört başlangıç noktasını kapsar. Oyuncu her denemede sabit noktadadır. Başarısızlık senaryoları (örneğin ajanın tamamen sıkışması) bu testte ölçülmemiştir.
+**Sınırlamalar:** Test yalnızca dört başlangıç noktasını kapsar. Oyuncu her denemede sabit noktadadır. Başarısızlık senaryoları (ör. ajanın köşede sıkışması) bu testte ölçülmemiştir. İki bilgisayar da aynı sahneyi çalıştırdığı için ikinci bilgisayar bağımsız bir senaryo değil, sonuçların yeniden üretilebilirliğinin kanıtıdır.
 
 ### 5.3 NPC diyalog örnekleri
 

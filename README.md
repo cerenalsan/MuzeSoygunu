@@ -189,8 +189,6 @@ Sol: ajanın 5 ışınlı sensörü (yeşil: boş yön, kırmızı: engel). Sağ
 
 ### 5.2 Otonom ajan testleri
 
-### 5.2 Otonom ajan testleri
-
 Ajanın şalteri çekme görevi, `AjanTestRunner` bileşeniyle otomatik olarak test edildi. Her denemede şalter sıfırlanır, oyuncu sabit noktaya ışınlanır, ajan başlangıç noktasına ışınlanır ve Q emri verilir. Şalter 30 saniye içinde çekilirse deneme başarılı sayılır. Test iki ayrı bilgisayarda (Ceren ve Zeynep) aynı sahne ve aynı ayarlarla çalıştırıldı. Ham sonuçlar [`ajan-test-20261031.csv`](docs/ajan-test/ajan-test-20261031.csv) (Ceren) ve [`ajan-test-zeynep-20261102.csv`](docs/ajan-test/ajan-test-zeynep-20261102.csv) (Zeynep) dosyalarındadır. İki dosya, bilgisayar sütunu eklenmiş hâliyle [`ajan-test-birlesik.csv`](docs/ajan-test/ajan-test-birlesik.csv) içinde birleştirilmiştir.
 
 | Koşul | Başlangıç noktası | Deneme (her bilgisayarda) | Başarılı (Ceren / Zeynep) | Başarı oranı | Ort. süre sn (Ceren) | Ort. süre sn (Zeynep) |

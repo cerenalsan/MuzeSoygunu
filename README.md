@@ -391,11 +391,26 @@ flowchart TD
 
 **Otonom ajan (NavMesh + sensör):**
 
-| Sensör ışınları | Durum geçişleri |
-|---|---|
-| ![Sensör](docs/ekran-goruntuleri/ajan-sensor.png) | ![Durumlar](docs/ekran-goruntuleri/ajan-durumlar.png) |
+**Otonom ajan (NavMesh + sensör):**
 
-Sol: ajanın 5 ışınlı sensörü (yeşil: boş yön, kırmızı: engel). Sağ: Console'da ajanın durum geçişleri (FollowPlayer → MoveToSwitch → PullSwitch → Done) ve şalterin çekilmesi.
+| Sensör ışınları (1) | Sensör ışınları (2) |
+|---|---|
+| ![Sensör](docs/ekran-goruntuleri/ajan-sensor.png) | ![Sensör, ikinci görünüm](docs/ekran-goruntuleri/ajan-sensoru.png) |
+
+Ajanın 5 ışınlı sensörü (yeşil: boş yön, kırmızı: engel) ve NavMesh üzerinde izlediği yol, lazer odasında iki farklı anda gösterilmiştir.
+
+| Durum geçişleri (1) | Durum geçişleri (2) |
+|---|---|
+| ![Durumlar](docs/ekran-goruntuleri/ajan-durumlar.png) | ![Durum geçişleri](docs/ekran-goruntuleri/ajan-durum-gecisleri.png) |
+
+Console'da ajanın durum geçişleri (FollowPlayer → MoveToSwitch → PullSwitch → Done) ve şalterin çekilmesi.
+
+**Oyun sahneleri:**
+
+| Menü | 01 Giriş | 02 Lazer Odası | 03 Çıkış |
+|---|---|---|---|
+| ![Menü](docs/ekran-goruntuleri/00-menu.png) | ![Giriş](docs/ekran-goruntuleri/01-giris.png) | ![Lazer odası](docs/ekran-goruntuleri/02-lazer.png) | ![Çıkış](docs/ekran-goruntuleri/03-cikis.png) |
+
 
 **NPC diyalog ve kapı açma senaryosu:**
 

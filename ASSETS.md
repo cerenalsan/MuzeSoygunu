@@ -13,9 +13,16 @@ Bu dosya, projede kullanılan üçüncü taraf görsel, ses ve diğer asset'leri
 
 Lisans metni: `Assets/_Project/Art/Kenney/TopdownShooter/License.txt`
 
+### Müze görselleri (Assets/_Project/Art/Muze)
+
+- **Kaynak:** Gemini (Google) ile üretilmiş yapay zekâ görseli, 3 Kasım 2026.
+- **İçerik:** Tek sayfa piksel-sanat müze nesneleri (vitrin, sütun, bank, halı, bitki, büst, fosil, kristal vb.). Arka plan temizlenip her nesne ayrı saydam PNG olarak kesildi (40 dosya).
+- **Kullanıldığı sahneler:** 01_Giris, 02_Lazer.
+- **Lisans/Not:** Üretici yapay zekâ aracının kullanım koşullarına tabidir. Bilinen eser kopyaları (Mona Lisa benzeri tablolar, Venüs heykeli) bilerek kullanılmadı.
+
 ## Kendi yaptığımız görsel nesneler
 
-Giriş holündeki kapı, kör nokta halısı, kadife bank, sütunlar, heykel ve vitrinler; lazer salonundaki engeller, vitrin, tezgâh, elmas, lazer ışınları ve şalter paneli Unity'nin yerleşik şekilleri (kare, daire) ve renklerle bu projede oluşturuldu. Bu nesneler için üçüncü taraf asset kullanılmadı.
+Lazer ışınları, şalter paneli ve hareketli engel gibi oyun mantığıyla ilgili nesneler Unity'nin yerleşik şekilleriyle (kare, daire) ve renklerle bu projede oluşturuldu. Bu nesneler için üçüncü taraf asset kullanılmadı. Dekoratif nesnelerin (vitrin, sütun, bank, halı, bitki vb.) görünümü yukarıdaki "Müze görselleri" bölümünde belirtilen Gemini görsellerine geçirilmiştir. Eski kare ve daire görünümler kapatılmış olarak sahnede durmaktadır.
 
 ## Sesler
 

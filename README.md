@@ -242,7 +242,64 @@ Modelin Unity tarafına gönderdiği cevap iki alandan oluşur:
 
 JSON cevabı `JsonNpcReplyParser` sınıfı tarafından ayrıştırılır. `say` alanının boş olmaması ve `action` değerinin tanımlı eylemlerden biri olması kontrol edilir. Geçerli cevap `NpcReply` nesnesine dönüştürülür.
 
-### 3.4 İstek ve Cevap Akışı
+### 3.4 Sınıf yapısı
+
+```mermaid
+classDiagram
+    class GuardNpc
+    class ILlmClient {
+        <<interface>>
+    }
+    class IPromptBuilder {
+        <<interface>>
+    }
+    class INpcReplyParser {
+        <<interface>>
+    }
+    class IGameAction {
+        <<interface>>
+    }
+    class IGameState {
+        <<interface>>
+    }
+    class IDialogueView {
+        <<interface>>
+    }
+    class ILlmHealth {
+        <<interface>>
+    }
+    class IOpenable {
+        <<interface>>
+    }
+    class OllamaClient
+    class GuardPromptBuilder
+    class JsonNpcReplyParser
+    class OpenDoorAction
+    class DenyAction
+    class AlarmAction
+    class DialogueUI
+    class LlmHealthCheck
+    class ExitDoor
+    GuardNpc --> ILlmClient
+    GuardNpc --> IPromptBuilder
+    GuardNpc --> INpcReplyParser
+    GuardNpc --> IGameAction
+    GuardNpc --> IGameState
+    OllamaClient ..|> ILlmClient
+    GuardPromptBuilder ..|> IPromptBuilder
+    JsonNpcReplyParser ..|> INpcReplyParser
+    OpenDoorAction ..|> IGameAction
+    DenyAction ..|> IGameAction
+    AlarmAction ..|> IGameAction
+    DialogueUI ..|> IDialogueView
+    LlmHealthCheck ..|> ILlmHealth
+    ExitDoor ..|> IOpenable
+    OpenDoorAction --> IOpenable
+```
+
+SOLID gerekçesi: `GuardNpc` yalnızca arayüzleri bilir (bağımlılığı tersine çevirme). Başka bir model sunucusuna geçmek `OllamaClient`'ı değiştirmek demektir. Yeni bir eylem eklemek mevcut eylemleri değiştirmez (açık/kapalı ilkesi). Her sınıfın tek bir işi vardır (tek sorumluluk).
+
+### 3.5 İstek ve Cevap Akışı
 
 1. Oyuncu güvenlik görevlisine mesaj gönderir.
 2. `GuardNpc`, mevcut diyalog durumunu kontrol eder.
@@ -282,7 +339,7 @@ sequenceDiagram
     UI-->>O: Yanıtı gösterir
 ```
 
-### 3.5 Hata Yönetimi
+### 3.6 Hata Yönetimi
 
 LLM iletişimi sırasında oluşabilecek hatalar kontrol edilmektedir.
 

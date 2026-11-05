@@ -17,7 +17,7 @@ Lisans metni: `Assets/_Project/Art/Kenney/TopdownShooter/License.txt`
 
 - **Kaynak:** Gemini (Google) ile üretilmiş yapay zekâ görseli, 3 Kasım 2026.
 - **İçerik:** Tek sayfa piksel-sanat müze nesneleri (vitrin, sütun, bank, halı, bitki, büst, fosil, kristal vb.). Arka plan temizlenip her nesne ayrı saydam PNG olarak kesildi (40 dosya).
-- **Kullanıldığı sahneler:** 01_Giris, 02_Lazer.
+- **Kullanıldığı sahneler:** 01_Giris, 02_Lazer, 03_Cikis.
 - **Lisans/Not:** Üretici yapay zekâ aracının kullanım koşullarına tabidir. Bilinen eser kopyaları (Mona Lisa benzeri tablolar, Venüs heykeli) bilerek kullanılmadı.
 
 ## Kendi yaptığımız görsel nesneler

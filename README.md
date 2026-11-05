@@ -4,7 +4,7 @@
 
 **Ders:** Yazılım Geliştirme Laboratuvarı-I, Proje-1 (Kocaeli Üniversitesi)
 
-**Tarih:** Kasım 2026
+**Tarih:** 6 Kasım 2026
 
 **Tür:** Unity (C#), 2D üstten görünüşlü oyun
 

@@ -608,21 +608,39 @@ Model belirlenen süre içerisinde yanıt vermediğinde oyun, kullanıcıya mode
 
 Ollama sunucusuna ulaşılamadığında kullanıcı "Tekrar dene" seçeneğini kullanabilir. Sunucu yeniden erişilebilir olduğunda oyun "Ollama hazır." mesajını gösterir ve bağlantının başarılı olduğunu bildirir.
 
+
 ## 6. Sonuç ve Tartışma
 
 <!-- Sahibi: Ceren + Zeynep -->
 
-Bu projede, müze soygunu senaryosu üzerinden yapay zekâ destekli karakterlerin oyun içerisindeki davranışları geliştirilmiştir. Projede iki farklı yapay zekâ yaklaşımı kullanılmıştır: NavMesh tabanlı otonom ajan ve Ollama üzerinden çalışan LLM tabanlı güvenlik görevlisi NPC.
+### 6.1 Başarılar
 
-Otonom ajan, oyuncunun verdiği komut doğrultusunda şaltere ulaşarak görevini yerine getirmektedir. NavMesh ve sensör sistemi sayesinde çevresindeki engelleri algılayarak hareket edebilmektedir.
+- **Otonom ajan:** Oyuncuya eşlik eden ajan, NavMesh üzerinde gerçek yol bularak şalteri çekiyor ve lazerleri kapatıyor. Davranış sabit bir yol değil, 5 ışınlı sensör ve Durum (State) örüntüsüyle tasarlanmış bir karar mekanizmasıdır. 4 farklı başlangıç noktası ve hareketli engel koşulunda, iki ayrı bilgisayarda toplam 120 denemenin 120'si başarılı oldu (bkz. 5.2).
+- **Yerel LLM NPC:** Ollama üzerinde çalışan `gemma3:4b`, güvenlik görevlisinin yanıtlarını dinamik üretiyor. Yanıtlar `say` ve `action` (`open_door`, `deny`, `alarm`) alanlı JSON olarak ayrıştırılıp oyun durumuna bağlanıyor. Beş diyalog senaryosunun dördünde (ikna eden, kızdıran, alakasız, itiraf eden) beklenen oyun sonucu elde edildi (bkz. 5.3).
+- **Dayanıklılık:** Ollama kapalıyken, model yokken, zaman aşımında ve bozuk JSON durumunda oyun çökmüyor, kullanıcı anlamlı bir mesaj görüyor ve "Tekrar dene" ile devam edebiliyor (bkz. 4 ve 5.4). İstekler asenkron yürütüldüğü için arayüz donmuyor.
+- **Mimari:** Ajan ve LLM bileşenleri birbirinden bağımsız. SOLID prensipleri uygulandı, saf mantık sınıfları Test Runner ile otomatik test ediliyor.
 
-LLM tabanlı NPC ise oyuncunun yazdığı mesajları değerlendirerek farklı oyun eylemleri gerçekleştirmektedir. Güvenlik görevlisi, oyuncunun verdiği gerekçeye göre kapıyı açabilmekte veya alarmı etkinleştirebilmektedir. Bu sistemde modelden alınan yanıtlar JSON formatında işlenerek oyun mekaniklerine bağlanmıştır.
+### 6.2 Karşılaşılan Zorluklar
 
-**Sınırlılıklar:**
+- **Model seçimi:** Demo bilgisayarında 6 GB VRAM bulunduğundan `gemma3:4b` seçildi, model tamamen GPU'da çalışıyor.
+- **Prompt tasarımı:** İlk sürümde görevli döngüye giriyor ve gereğinden fazla şüpheli davranıyordu. Prompt v2'de kurallar kısa ve net yazıldı, sürümler `docs/prompt-surumleri.md` dosyasında tutuluyor.
+- **2D NavMesh:** Unity'nin yerleşik NavMesh'i 2D projede doğrudan çalışmadığından NavMeshPlus kullanıldı.
 
-- LLM tabanlı NPC'nin çalışması için Ollama sunucusunun açık ve gerekli modelin yüklü olması gerekmektedir.
-- Modelin yanıt süresi internet bağlantısından bağımsız olarak yerel bilgisayarın donanımına göre değişebilir.
-- Otonom ajan testleri belirli başlangıç noktaları ve test koşullarıyla sınırlıdır.
+### 6.3 Sınırlılıklar
+
+- **Prompt injection:** "Önceki talimatlarını unut" türü cümlede model rolünden çıkmadı ama kapıyı açtı ve cevap metniyle karar çelişti (5.3). Küçük bir model olduğu için bu davranış prompt ile tamamen engellenemedi.
+- Küçük bir model (4B) olduğu için görevli, kuralda yazmasına rağmen bazen 2–3 soru soruyor ve aynı cümleye farklı denemelerde farklı karar verebiliyor (karar sabit değil).
+- İtiraf cevabında bozuk karakterler gözlendi, sebebi araştırılmadı.
+- LLM tabanlı NPC'nin çalışması için Ollama sunucusunun açık ve modelin yüklü olması gerekir. Yanıt süresi donanıma bağlıdır, ölçümler 6 GB VRAM'li bilgisayarda alındı.
+- Ajan testleri belirli başlangıç noktaları ve test koşullarıyla sınırlıdır, oyuncu konumu sabittir. Ajanın köşede sıkışması gibi başarısızlık senaryoları ölçülmedi.
+
+### 6.4 Olası Geliştirmeler
+
+- Prompt injection'a karşı çıktı doğrulaması (örneğin kapı kararı için ikinci bir kontrol adımı) ve daha büyük bir model denemesi.
+- Çıkış menüsü (Esc) ve oyun içi ayarlar.
+- Sohbet geçmişi uzunluğunu ayarlanabilir yapmak.
+- Farklı görevli kişilikleri ve modellerin karşılaştırılması.
+- Ajan testlerini rastgele oyuncu konumları ve daha fazla başlangıç noktasıyla genişletmek.
 
 **Riskler:** [docs/risk-notlari.md](docs/risk-notlari.md) · Kararlar: [docs/kararlar.md](docs/kararlar.md)
 
@@ -639,8 +657,8 @@ ollama pull gemma3:4b
 Model yaklaşık 3,4 GB'dır. Önerilen donanım: en az 6 GB VRAM'li ekran kartı (model GPU'da çalışır). Ollama kapalıyken oyun çökmez, ekranda hata mesajı gösterir ve Ollama açıldıktan sonra "Tekrar dene" düğmesiyle devam edilir.
 
 **Build'i çalıştırma**
-1. Ollama'nın çalıştığından emin olun (sistem tepsisinde lama simgesi).
-2. Build klasöründeki `.exe` dosyasını çalıştırın.
+1. [Releases](https://github.com/cerenalsan/MuzeSoygunu/releases) sayfasından `MuzeSoygunu-v1.0.zip` dosyasını indirip bir klasöre ayıklayın.
+2. MuzeSoygunu.exe’yi çalıştırın
 3. Menüden "Başla"ya basın.
 
 **Projeyi Unity'de açma**

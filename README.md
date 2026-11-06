@@ -33,9 +33,6 @@ Projede iki farklı yapay zekâ yaklaşımı kullanılmıştır:
 - Ollama
 - Gemma 3 (gemma3:4b)
 
-**Oyun Haritası:**
-
-<!-- Müze haritasının ekran görüntüsü buraya eklenecektir. -->
 
 ## 2. Otonom AI Kahramanın Karar Mekanizması (NavMesh)
 

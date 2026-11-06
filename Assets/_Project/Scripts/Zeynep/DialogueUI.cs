@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -6,8 +7,6 @@ using UnityEngine.UI;
 
 namespace MuzeSoygunu.Llm
 {
-    // Diyalog ekranı: sohbet geçmişi, yazı kutusu, gönder ve tekrar dene düğmeleri, "Düşünüyor...". IDialogueView uygular.
-    // Bu bileşen panelin kendisinde değil, her zaman açık kalan bir üst nesnede durmalıdır.
     public class DialogueUI : MonoBehaviour, IDialogueView
     {
         [SerializeField] private GameObject panel;
@@ -15,12 +14,14 @@ namespace MuzeSoygunu.Llm
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private TMP_InputField inputField;
         [SerializeField] private Button sendButton;
-        [SerializeField] private Button retryButton; // isteğe bağlı
-        [SerializeField, Min(1)] private int maxLines = 8;
+        [SerializeField] private Button retryButton;
+        [SerializeField] private ScrollRect chatScroll;
+        [SerializeField, Min(1)] private int maxLines = 40;
 
         private readonly List<string> lines = new List<string>();
         private bool busy;
         private bool locked;
+        private int lastDots;
 
         public event Action<string> MessageSubmitted;
         public event Action RetryRequested;
@@ -62,6 +63,18 @@ namespace MuzeSoygunu.Llm
             if (retryButton != null) retryButton.onClick.RemoveListener(OnRetryClicked);
         }
 
+        private void Update()
+        {
+            if (!busy) return;
+
+            int dots = (int)(Time.unscaledTime * 3f) % 3 + 1;
+            if (dots != lastDots)
+            {
+                lastDots = dots;
+                statusText.text = "Düşünüyor" + new string('.', dots);
+            }
+        }
+
         public void Show()
         {
             panel.SetActive(true);
@@ -73,7 +86,6 @@ namespace MuzeSoygunu.Llm
             panel.SetActive(false);
         }
 
-        // Diyalog bitince yazma ve göndermeyi kapatır.
         public void LockInput()
         {
             locked = true;
@@ -100,17 +112,15 @@ namespace MuzeSoygunu.Llm
         public void SetBusy(bool isBusy)
         {
             busy = isBusy;
-            statusText.text = isBusy ? "Düşünüyor..." : string.Empty;
+            lastDots = 0;
+            statusText.text = isBusy ? "Düşünüyor." : string.Empty;
 
             if (retryButton != null)
             {
                 retryButton.interactable = !isBusy;
             }
 
-            if (locked)
-            {
-                return;
-            }
+            if (locked) return;
 
             sendButton.interactable = !isBusy;
             inputField.interactable = !isBusy;
@@ -131,16 +141,8 @@ namespace MuzeSoygunu.Llm
 
         private void OnRetryClicked()
         {
-            if (busy || locked)
-            {
-                return;
-            }
-
-            Action handler = RetryRequested;
-            if (handler != null)
-            {
-                handler();
-            }
+            if (busy || locked) return;
+            RetryRequested?.Invoke();
         }
 
         private void OnInputSubmit(string _)
@@ -150,36 +152,39 @@ namespace MuzeSoygunu.Llm
 
         private void Submit()
         {
-            if (busy || locked)
-            {
-                return;
-            }
+            if (busy || locked) return;
 
             string text = inputField.text;
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(text)) return;
 
             inputField.text = string.Empty;
-
-            Action<string> handler = MessageSubmitted;
-            if (handler != null)
-            {
-                handler(text.Trim());
-            }
+            MessageSubmitted?.Invoke(text.Trim());
         }
 
         private void AddLine(string line)
         {
             lines.Add(line);
-
             while (lines.Count > maxLines)
             {
                 lines.RemoveAt(0);
             }
 
             chatText.text = string.Join("\n", lines);
+
+            if (chatScroll != null && isActiveAndEnabled)
+            {
+                StartCoroutine(ScrollToBottom());
+            }
+        }
+
+        private IEnumerator ScrollToBottom()
+        {
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+            if (chatScroll != null)
+            {
+                chatScroll.verticalNormalizedPosition = 0f;
+            }
         }
     }
 }
